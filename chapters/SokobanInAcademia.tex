@@ -1,0 +1,103 @@
+\section{NP-hard}
+In the previous chapter, we discussed briefly the definition of NP-hard problems as well as the academic significance Sokoban as a proxy of solving generic NP-hard problems. This leads to the question of how Fryers et al proved that the Sokoban is NP-hard. 
+
+Before following their proof, we first define $P$ problem as being a problem that can be solved in at most a polynomial time. $NP$ problems are ones where it takes a polynomial time to verify the existence of a solution to the problem but not necessarily its solution. Any $P$ problem is $NP$ because if we can derive the solution in polynomial time, we have shown that the solution exists in polynomial time. It is unknown whether all $NP$ problems are $P$. $NP-hard$ problems are ones that can express any other $NP$ problems. An $NP-hard$ problem that is also $NP$ itself is a $NP-complete$ problem. The simplest $NP-complete$ problem is Boolean Satisfiability problem; for a given boolean expression $B(x_1,x_2,\ ...\ ,x_n)$ that includes all $\neg$, $\land$, and $\lor$, is there a set of $x_1,x_2,\ ...\ ,x_n$ that makes $B$ true?
+
+If Sokoban can answer this question, then the game is as hard as the Boolean Satisfiability which is an $NP-hard$ problem and therefore be an $NP-hard$ problem itself. For this, the researchers first demonstrated that simple boolean expressions can be encoded through playable Sokoban levels; "a level has a solution if and only if the expression can be true, and such that we can construct (in polynomial time) a valuation from a solution and vice versa."\cite{fryers1995sokoban} Successfully encoding a boolean expression that includes all $\neg$, $\land$, and $\lor$ would show Sokoban is a problem that includes all 
+
+\begin{figure}[h] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/nphard-1.png} 
+    \includegraphics[width=0.3\textwidth]{images/nphard-5.png} 
+    \caption{}
+    \label{fig:nphard-1}
+\end{figure}
+
+Figure \ref{fig:nphard-1} shows a level with one entrance on the left and one exit on the right. The player can travel from the entrance to the exit by pushing the barrel (marked with a black circle) to the right and after going through, back to left in order to clear the path to the exit. Not only does this clear the path for the player, but it also places the barrel back on the goal position marked with a square. However, the player can not travel from the exit to the entrance because the player can only push the box to left which would block the path as well as making it immobile. This structure is called a \textit{turnstile}.
+
+\begin{figure}[h] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/nphard-2.png} 
+    \includegraphics[width=0.3\textwidth]{images/nphard-6.png} 
+    \caption{}
+    \label{fig:nphard-2}
+\end{figure}
+
+Figure \ref{fig:nphard-1} is a \textit{1-gate} that can only be travelled once by the player and only in one direction, from left to right. This is because the left barrel needs to be pushed to the left to its goal position to be considered solved and this action must precede the movement of the right barrel which, after its push to the left would prevent the left barrel from being moved. This gate can be placed in parallel to create an \textit{n-gate} which allows the traversal from left to right for $n$ number of times
+
+Using a combination of $n-gates$ and $turnstile
+$, we will construct the following boolean expression:
+$$B(x,y,z) = (z\ \land\ \{(\neg y\ \land \neg z) \lor (\neg x\ \lor y)\}$$
+
+\begin{figure}[h] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/nphard-3.png} 
+    \caption{}
+    \label{fig:nodegraph}
+\end{figure}
+
+The same boolean expression can be expressed as a graph of nodes (Figure \ref{fig:nodegraph}) where the player can only travel from left to right. 
+
+For a given set of $x,y,z$, each node is traversable only if the expression inside is true. 
+
+If the player can start from the left-end of the graph and reach the right-end of the graph, $B(x,y,z)$ is true. 
+
+For example, if $x=0,y=0,z=1$, it would go through the nodes $z$ and $ \neg x$ to reach the right-end of the graph. 
+
+This graph can then be recreated with the previous Sokoban level sections if we define each node as following:
+
+\begin{figure}[h] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/nphard-4.png} 
+    \caption{}
+    \label{fig:nphard-4}
+\end{figure}
+
+The node has entrances $A,D$ and exits $B,C$. The player can traverse the node on the bold line through either the $r_j-gate$(an $n-gate$ that can be traveled through $r_j$ times) or the $turnstile$. Notice that if the player enters $D$ and leaves through $C$, it blocks the $turnstile$ path above and is forced to go through the $r_j-gate$ path as the barrel will be pushed upwards into the path of the $turnstile$ path and become stuck there. The bold path and the faint path are separate because even though the barrel can be pushed away, it would cause the barrel to get stuck in non-goal position. This node will be incorporated into the node graph from Figure \ref{fig:nodegraph} in a way so that the bold path of $x$ node is blocked when $x=0$, blocking $\neg y$ when $y=1$ and so one. 
+
+To show that $B$ has a solution, the player has to be able to complete the node graph implemented in Sokoban seen in \ref{fig:b_implementation}. (Figure \ref{fig:b_implementation} also uses crossover implemented in Sokoban which is omitted in this paper for brevity)
+
+Suppose $B(x,y,z)$ as implemented in \ref{fig:b_implementation} is true (solvable with all barrels on its goal positions) and there exists a set of inputs $(x_1,x_2,\ ... , x_n)$ (which is $x,y,z$ in our expression) that makes the $B$ true. With this condition, the player can solve $B$ by following the steps below:
+
+1. From 'start', travel the path $x$ if $x$ is true and $\neg x$ if otherwise and so on. 
+2. The player reaches P for the first time. From here, travel the bold paths using $turnstile$ path of each nodes without using $r_j-gates$ which can be done because $B$ is true. The player reaches Q.
+3. Traverse the faint paths not used in the first cycle to return to P.
+4. From P, use the bold paths to reach Q, using $r_j-gates$ of a set of nodes that connects from P to Q. 
+5. The player has now fully solved the path between 'start' and P. The remaining combinations of the bold paths that connect P to Q can be traveled by using the bottome bold line that has no node.
+6. After travelling through the $r+1-gate$ $r+1$ times, the player can place the barrel in the R section to complete the entire level.
+
+This demonstrates that Sokoban can successfully encode an $NP-hard$ problem and therefore is an $NP-hard$ problem itself. Readers can choose to complete Figure \ref{fig:b_implementation} by hand with the truth table below:
+
+\begin{table}[h]
+\centering
+\label{tab:sokoban_logic}
+\renewcommand{\arraystretch}{1.2} % Adds breathing room between rows
+\begin{tabular}{ @{} ccc | ccc | cc | c | c @{} }
+\toprule
+$x$ & $y$ & $z$ & $\neg x$ & $\neg y$ & $\neg z$ & $\neg y \land \neg z$ & $\neg x \lor y$ & Inner Term & $B(x,y,z)$ \\
+\midrule
+0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 0 \\
+0 & 0 & 1 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 1 & 0 \\
+1 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 1 & 0 \\
+\addlinespace % Visual break for readability
+0 & 1 & 1 & 1 & 0 & 0 & 0 & 1 & 1 & 1 \\
+1 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 0 \\
+\addlinespace % Visual break for readability
+1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\caption{Truth table for the Boolean function $B(x,y,z)$}
+\end{table}
+
+
+\begin{figure}[h] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=1.4\textwidth, angle=90]{images/nphard-7.png} 
+    \caption{}
+    \label{fig:b_implementation}
+\end{figure}
+
+\section{}
+We have shown that Sokoban is a difficult and valid academic problem by showing that it is an $NP-hard$ problem.\cite{fryers1995sokoban} \cite{cook2023complexity}
