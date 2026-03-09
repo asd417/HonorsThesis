@@ -1,7 +1,11 @@
 \input{chapters/nphard}
 
-\section{}
-We have shown that Sokoban is a difficult and valid academic problem by showing that it is an $NP-hard$ problem.
-\cite{fryers1995sokoban} \cite{cook2023complexity}
+\input{chapters/pspace.tex}
 
-TEST
+\input{chapters/PuzzleGeneration.tex}
+
+
+\section{Early Attempts at Solving Sokoban}
+
+Early attempts at solving Sokoban relied on variations of traiditional algorithmic search such as A*. Junghanns et al presented numerous research projects that in the late 90s. In one of their works, they attempt to solve all 90 puzzles of the XSokoban test suite using IDA*. \cite{myers_xsokoban} \cite{junghanns1997sokoban} \cite{junghanns1998sokoban} The researchers demonstrate a modified IDA* search method named 'Rolling Stone' that incorporates a Deadlock Table to identify a deadend circumstatance earlier in the heuristics search tree expansion to prune searching. The Deadlock Table consisted of 22 million entries of frequently occuring board pattern that leads to a deadend. The Rolling Stone also introduced a concept of 'Macro Moves' that collapses a sequence of forced moves into single steps for more efficient memory use during search while presercing solution optimality. 
+
