@@ -9,3 +9,32 @@
 
 
 In the late 90s and 2000s, the focus of Sokoban research shifted from the difficulty of the problem to the solution of the problem. Early attempts at solving Sokoban relied on variations of traiditional algorithmic search such as A*. Junghanns et al presented numerous research projects that in the late 90s. In one of their works, they attempt to solve all 90 puzzles of the XSokoban test suite using IDA*. \cite{myers_xsokoban} \cite{junghanns1997sokoban} \cite{junghanns1998sokoban} The researchers demonstrate a modified IDA* search method named 'Rolling Stone' that incorporates a Deadlock Table to identify a deadend circumstatance earlier in the heuristics search tree expansion to prune searching. The Deadlock Table consisted of 22 million entries of frequently occuring board pattern that leads to a deadend. The Rolling Stone also introduced a concept of 'Macro Moves' that collapses a sequence of forced moves into single steps for more efficient memory use during search while presercing solution optimality. 
+
+
+
+Write more about Heuristics and Macro based approaches
+
+
+Write about its limitations
+( Limitations of Classical Search
+Briefly note why IDA*/A* hits a wall: the state space explodes, deadlock detection is expensive, and the 22M-entry deadlock table is essentially hand-engineered domain knowledge. This motivates the search for better heuristics and representations.)
+
+
+
+3.6 — Reinforcement Learning Approaches
+This is where the field pivots. The key papers:
+
+Schrader (2018) — "Sokoban for OpenAI Gym" — created the standard RL benchmark environment most modern work uses.
+Weber et al. / DeepMind (2017) — "Imagination-Based Planning" — used Sokoban as a testbed for model-based RL.
+Guez et al. (2019) — "An Investigation of Model-free Planning" — DeepMind's direct attack on Sokoban with RL, showing its difficulty as a benchmark.
+
+
+3.7 — Egocentric / Representation-Based Approaches
+This is where you position your own work. You'd discuss how the representation of the state given to the agent affects learning — egocentric views vs. global views — which directly motivates your thesis contribution.
+
+Cite Julieus Togelius \cite{togelius2005evolving} \cite{togelius2006evolving}
+"These papers compared five controller architectures using egocentric (first-person), Newtonian (third-person), or no state information. The key finding was that the only controller able to evolve good behavior was the one based on a neural network acting on egocentric inputs. Wikipedia This is the canonical empirical demonstration that egocentric observation outperforms allocentric observation in evolved game agents."
+\cite{risi2015neuroevolution}
+
+"How to Frame This in Your Sokoban Thesis
+The Togelius car racing result is your theoretical anchor for why you're trying egocentrism in Sokoban. The argument flows naturally: if egocentric representation was the decisive factor in evolved car racing controllers, it's worth investigating whether the same holds for a puzzle-solving agent in Sokoban, where the player's local context (what's immediately adjacent) may matter more than global board awareness. That's your research question."
