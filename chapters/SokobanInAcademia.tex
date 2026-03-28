@@ -3,38 +3,3 @@
 \input{chapters/pspace.tex}
 
 \input{chapters/PuzzleGeneration.tex}
-
-
-\section{Early Attempts at Solving Sokoban}
-
-
-In the late 90s and 2000s, the focus of Sokoban research shifted from the difficulty of the problem to the solution of the problem. Early attempts at solving Sokoban relied on variations of traiditional algorithmic search such as A*. Junghanns et al presented numerous research projects that in the late 90s. In one of their works, they attempt to solve all 90 puzzles of the XSokoban test suite using IDA*. \cite{myers_xsokoban} \cite{junghanns1997sokoban} \cite{junghanns1998sokoban} The researchers demonstrate a modified IDA* search method named 'Rolling Stone' that incorporates a Deadlock Table to identify a deadend circumstatance earlier in the heuristics search tree expansion to prune searching. The Deadlock Table consisted of 22 million entries of frequently occuring board pattern that leads to a deadend. The Rolling Stone also introduced a concept of 'Macro Moves' that collapses a sequence of forced moves into single steps for more efficient memory use during search while presercing solution optimality. 
-
-The Rolling Stone algorithm was able to find solution to 16 problems out of 90 problems with a tree shallower than the solution itself. This was made possible with Macro Moves. However this method comes with significant limitation as it requires 22 million rows of deadlock pattern which is hard-coded domain knowledge. The paper also recognizes that the Rolling Stone spends 90\% of its execution time updating the lower bounds which means most of the processing time is spent on optimizing a found solution. \cite{junghanns1998sokoban} 
-
-A similar method was tried by Pereira et al \cite{pereira2013finding} where researchers employ pattern database, a pre-computed lookup table that stores the shortest distances for simplified local problems, to be used as heuristics in the IDA* search. The authors introduced a concept called instance decomposition. Because it's not possible to know which stone is placed on which goal position before the solution of the puzzle, instance decompoisition assigns each stone to a specific goal before running the search. This constraint acts as an intermediate goal and converts the multi-goal problem into a single-goal problem. During the search, the Pattern Database provides an admissible heuristics to be used for pruning search tree. 
-
-
-
-This motivates the search for better heuristics and representations.
-
-
-
-
-3.6 — Reinforcement Learning Approaches
-This is where the field pivots. The key papers:
-
-Schrader (2018) — "Sokoban for OpenAI Gym" — created the standard RL benchmark environment most modern work uses.
-Weber et al. / DeepMind (2017) — "Imagination-Based Planning" — used Sokoban as a testbed for model-based RL.
-Guez et al. (2019) — "An Investigation of Model-free Planning" — DeepMind's direct attack on Sokoban with RL, showing its difficulty as a benchmark.
-
-
-3.7 — Egocentric / Representation-Based Approaches
-This is where you position your own work. You'd discuss how the representation of the state given to the agent affects learning — egocentric views vs. global views — which directly motivates your thesis contribution.
-
-Cite Julieus Togelius \cite{togelius2005evolving} \cite{togelius2006evolving}
-"These papers compared five controller architectures using egocentric (first-person), Newtonian (third-person), or no state information. The key finding was that the only controller able to evolve good behavior was the one based on a neural network acting on egocentric inputs. Wikipedia This is the canonical empirical demonstration that egocentric observation outperforms allocentric observation in evolved game agents."
-\cite{risi2015neuroevolution}
-
-"How to Frame This in Your Sokoban Thesis
-The Togelius car racing result is your theoretical anchor for why you're trying egocentrism in Sokoban. The argument flows naturally: if egocentric representation was the decisive factor in evolved car racing controllers, it's worth investigating whether the same holds for a puzzle-solving agent in Sokoban, where the player's local context (what's immediately adjacent) may matter more than global board awareness. That's your research question."

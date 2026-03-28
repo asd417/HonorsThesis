@@ -1,0 +1,24 @@
+\section{I2A and Boxoban}
+In 2017, Google researchers introduced a novel architecture \cite{NEURIPS2017_7ca66fc0} for reinforcement learning (RL) that bridges the gap between model-free and model-based approaches. Unlike standard agents that react directly to the environment, Imagination-Augmented Agents (I2As) learn to "imagine" future steps using an internal, potentially imperfect environment model. Instead of predicting an action solely from the current state, the agent first samples several future scenarios and interprets these trajectories to inform its next move.
+
+Classical planning methods, such as Monte Carlo Tree Search (MCTS), expand search branches based on a model's predictions, which typically requires the model to be perfectly accurate. I2As circumvent this limitation by using an encoder to extract meaningful features from simulated trajectories, making the system significantly more robust to model inaccuracies or failures.
+
+The I2A architecture consists of three major components.
+
+First is the Imagination Core(IC). IC is a type of model that is now more commonly known as World Model.\cite{worldmodel} This model is pretrained on trajectories of the environment. The transition model $M$ takes the current observation $s_t$ and a proposed action $a_t$ to predict the subsequent state $s_{t+1}$ and the immediate reward $r_{t+1}$
+
+
+\[M(s_{t+1},\ r_{t+1}|s_t,\ a_t)\]
+
+Follwing the IC is the Rollout Stategy. To generate an imagined trajectory, the agent must decide not just the first action, but a sequence of future actions. The rollout stategy is typically a simplified, distilled version of the agent's current policy. It performs $n$ look-ahead steps to produce a rollout consisting of imagined states, actions, and rewards. This component is essential because it determines which parts of the future state-space the agent explores during its deliberation phase.
+
+The third component is the Rollout Encoder. Traditional model-based RL often fails if the internal model is inaccurate as the agent might trust a high-reward path that doesn't actually exist. The Rollout Encoder processes the entire sequence of imagined transitions and compresses them into a fixed dimensional vector. The encoder learns to extract features from the imagination. If the IC is inaccurate, the encoder can learn to identify those inconsistencies. 
+
+Finally, the Aggregator is a network that uses the current environment state and the imagined path from the rollout encoder to select an action. By replacing parts of MCTS with pretrained networks, I2A can perform training tasks such as solving Sokoban puzzles.
+
+Google demonstrated the efficacy of the I2A agent using Boxoban, a massive dataset consisting of 9 million procedurally generated Sokoban levels. Sokoban is a challenging benchmark because moves are often irreversible, requiring deep strategic planning.
+
+The performance of I2A was compared against prominent model-free architectures, specifically A3C (Asynchronous Advantage Actor-Critic). While the A3C agent achieved a 60\% solve rate, the I2A agent solved 85\% of the same test set. Furthermore, I2A proved more resource-efficient; because its training procedure is partially independent of the live environment, it required substantially fewer environment interactions to converge.
+
+Beyond the architecture itself, the Boxoban dataset remains a significant contribution to the RL community, providing a standardized and rigorous benchmark for evaluating generalization and planning in artificial agents.
+

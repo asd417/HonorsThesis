@@ -18,8 +18,21 @@
     \vspace{0.9cm}
     \textbf{Abstract}
 \end{center}
-literature review needs to be written after the literature review
+
+This thesis examines the role of input compression methods in improving agent performance
+within PuzzleJAX, a GPU-accelerated puzzle-solving benchmark for AI reasoning. Prior work in
+game-playing agents has shown that compressed input representations using the Discrete
+Cosine Transform (DCT) can outperform conventional reinforcement learning models by
+achieving a higher score with a lower weight count. This thesis extends these ideas to Boxoban,
+a Sokoban level dataset by Google. Previous studies have yet to explore input type and
+compression method on sokoban games, motivating the use of novel input compression
+techniques in the study.
 
 
-
-I talk about history, the usecase in computer science, and my solution, tyring egocentrism
+This project evaluates several input compression strategies, including frequency domain
+transforms and autoencoder embeddings. These compression techniques are used for training
+both the policy network and the value network. The police network is trained on solution
+trajectory of Boxoban levels found through Breath First Search and the value network is trained
+with reinforcement learning, bootstrapping the policy network through AlphaGo-styled tree
+search. The findings highlight appropriate compression strategies that improve agent
+performance in planning-intensive tasks.
