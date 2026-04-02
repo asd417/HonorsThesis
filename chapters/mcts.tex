@@ -1,2 +1,14 @@
 \section{Monte Carlo Tree Search}
-Monte Carlo Tree Search is a heuristic search algorithm used for planning. \cite{coulom2008monte}
+Monte Carlo Tree Search is a heuristic search algorithm used for planning in discrete action space. \cite{coulom2008monte} Unlike A*, which rely on fixed heuristic function to evaluate states, MCTS evaluates the score of the state by performing simulations to evaluate how often a particular move leads to a win or solution.
+
+From the current state, the tree expands with possible actions. From each expanded action, the agent randomly performs multiple rollouts, which are the process of playing a full environment from the current state. Probabilistically, the random rollout will tell how good the selected action is based on the average returned score. The best action is selected with this method and with the newly selected action, the tree expands again. 
+
+In a standard MCTS, in order to increase the chance of expanding the high reward leaf first, nodes with higher Upper Confidence Bound (UCB) is selected first. The chosen action $A_i$ at node $i$ is the action with maximum UCB score calculated by average win count $\frac{w_i}{s_i}$ added to exploration parameter $c$ multiplied by natural log of parent node's total number of simulations $s_p$ divided by total number of simulation $s_i$
+
+$$A_i = argmax_a(\frac{w_i}{s_i} + c\sqrt{\frac{ln(s_p)}{s_i}})$$
+
+The average win count biases towards higher score actions and continues to search for the branch with higher score while the exploration term spreads the selection to more than one node path. The UCB value relies on wins as it was originated from the Multi-Armed Bandit (MAB) problem, a classic framework in probability that addresses the exploration-exploration trade-off.
+
+With the introduction of neural networks as a function that replace the UCB value, neural network-based agents can now search the action space that would provide the best outcome after several actions.
+
+AlphaGo \cite{silver2017mastering} was one of the most prominent demonstration of combining MCTS with deep neural networks. By replacing  random rollouts and UCB with two separate deep neural networks, policy network and value network, the agent was able to successfully play against competitive players in a game of GO where the branching factor is so high that MCTS loses its proficiency. 
