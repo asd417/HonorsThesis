@@ -6,4 +6,83 @@ Similar methods that use pattern recognition of tiles for searching the solution
 
 \input{chapters/mcts.tex}
 
+An analysis of single-player Monte Carlo tree search performance in sokoban.
+\cite{crippa2022analysis} (which came out after google's research but should mention) \input{chapters/early-sokoban.tex}
+
+\section{Reinforcement Learning Approaches}
+
+Similar methods that use pattern recognition of tiles for searching the solution stayed as the dominent solution search method until Google released I2A, an Imagination 2 Action agent based on reinforcement learning. In order to understand this agent, one must first understan its roots in Monte Carlo Tree Search.
+
+\input{chapters/mcts.tex}
+
+
 \input{chapters/i2a-boxoban.tex}
+
+An analysis of single-player Monte Carlo tree search performance in sokoban.
+\cite{crippa2022analysis} (which came out after google's research but should mention) 
+Sokoban is difficult for three main reasons: Irreversibility, Sparse rewards, Planning Depth
+
+Proposed Architecture Policy and Value Network
+
+Curriculum Learning
+
+Search Integratione,ll
+
+
+
+
+
+
+
+
+Learning generalized reactive policies using deep neural networks
+
+DNN can learn and represent a Generalized Reactive Policy(GRP): Maps a problem instance and a state to an action, and that the learned GRP efficiently solve large classes of challenging problems. 
+
+Compared to previous works: reduces dependence of learning on handcrafted domain knowledge or feature selection. Trained from scratch using a set of successful execution traces. 
+
+They used Multi-headed convolutional neural network (supports the empirical findings of myself) for Action Probability and Plan Length prediction \cite{groshev2018learning}
+
+
+
+
+Solving Sokoban with Forward-Backward Reinforcement Learning (also from Google)
+\cite{shoham2021solving}
+
+Sokoban is a sparse reward environment. So we used two networks: backward facing and forward facing.
+
+XSokoban dataset
+
+The backward model is learned by starting the agent in the goal poistions anwhere rewards are received. -> design reversed task: pull(not push because reverse) boxes away from the goal position (to any position). Retrieve value function $V_B$ from this whish can be used to train the forward-learning model and create backward trajectroy $T$: for a particular instance the agent is initialized at goal state(s), and a planning algorithm is used to find $T$ that maximizes $V_B$
+
+Forward-facing value functions are $V_F$. But it also takes in \textit{hint features} based on the current state $s$ and the instance specific backward trajectory $T$. 
+
+Novel approach to sparse-reward scenarios.
+Basically mentioned that IDA* still provides the best performance
+
+
+\input{chapters/i2a-boxoban.tex}
+
+Learning generalized reactive policies using deep neural networks
+
+DNN can learn and represent a Generalized Reactive Policy(GRP): Maps a problem instance and a state to an action, and that the learned GRP efficiently solve large classes of challenging problems. 
+
+Compared to previous works: reduces dependence of learning on handcrafted domain knowledge or feature selection. Trained from scratch using a set of successful execution traces. 
+
+They used Multi-headed convolutional neural network (supports the empirical findings of myself) for Action Probability and Plan Length prediction \cite{groshev2018learning}
+
+
+
+
+Solving Sokoban with Forward-Backward Reinforcement Learning (also from Google)
+\cite{shoham2021solving}
+
+Sokoban is a sparse reward environment. So we used two networks: backward facing and forward facing.
+
+XSokoban dataset
+
+The backward model is learned by starting the agent in the goal poistions anwhere rewards are received. -> design reversed task: pull(not push because reverse) boxes away from the goal position (to any position). Retrieve value function $V_B$ from this whish can be used to train the forward-learning model and create backward trajectroy $T$: for a particular instance the agent is initialized at goal state(s), and a planning algorithm is used to find $T$ that maximizes $V_B$
+
+Forward-facing value functions are $V_F$. But it also takes in \textit{hint features} based on the current state $s$ and the instance specific backward trajectory $T$. 
+
+Novel approach to sparse-reward scenarios.
