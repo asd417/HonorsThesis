@@ -5,7 +5,25 @@
 \section{Contributions}
 
 
+1.1 Motivation
 
+    The "Holy Grail" of Planning: Explain that Sokoban is a primary benchmark for AI because it is NP-hard and PSPACE-complete, meaning it represents the upper limits of complexity in discrete planning.
+
+    Resource Constraints: Highlight the growing need for efficient AI. While models like I2A achieve high success rates (85%), they often require massive computational resources. Your motivation is to see if we can maintain this performance while significantly reducing the "weight count" or memory footprint of the agent.
+
+1.2 Problem Statement
+
+    Sparse Rewards and Irreversibility: Define the core difficulties of the environment—namely that one wrong push can lead to an "unrecoverable configuration" (deadlock), and the agent rarely receives feedback until the puzzle is solved.
+
+    Input Dimensionality: Discuss the challenge of the 10×10 multi-hot grid. Explain that standard models might be "over-parameterized" for these grids, motivating your study into whether DCT or Autoencoders can distill the most vital spatial information for the policy and value networks.
+
+1.3 Contributions
+
+    PuzzleJAX Implementation: State that you have implemented these agents within the PuzzleJAX framework, utilizing GPU acceleration to handle the 9 million levels of the Boxoban dataset.
+
+    Comparative Analysis: Clarify that your primary contribution is the rigorous evaluation of different compression strategies—Frequency Domain (DCT) vs. Latent Space (Autoencoders)—and documenting their impact on an AlphaGo-style agent's ability to plan.
+
+    Trajectory Insights: Mention your use of MPCA to visualize and justify the move toward recurrent architectures (RNNs/Transformers) based on the curvilinear nature of solution paths.
 
 \begin{figure}[h] % [h] forces the image to be placed "here"
     \centering

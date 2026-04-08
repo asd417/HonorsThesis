@@ -1,47 +1,93 @@
 \section{PuzzleJAX}
-
+The PuzzleJAX framework, developed by Julian Togelius et al., represents a significant shift in how puzzle-solving agents are trained and evaluated in artificial intelligence research. It is a high-performance, GPU-accelerated benchmark designed specifically to facilitate AI reasoning within combinatorial puzzle environments. By leveraging the JAX library, the framework allows for massive parallelism and end-to-end differentiability, enabling the simulation of thousands of environments simultaneously on a single accelerator.
 \section{Boxoban}
+The PuzzleJAX environment is utilized to load the Boxoban dataset, a collection of 9 million procedurally generated Sokoban levels released by Google. These levels are constrained to a $10\times10$ grid, providing a standardized yet vast state space for evaluating an agent's ability to generalize across millions of unique configurations.
 
 \section{Agent Architecture}
-To create an agent that can plan ahead in the sparse reward landscape, we will use an AlphaGo-style agent where a treesearch is driven by a policy function $\pi$ and a value function $V$ that takes in the current puzzle state $s_t$ preprocessed by some compression function $c$. The policy function outputs an action logit $a$ that the treesearch prioritizes for searching and the value function outputs a scalar value that determines the 'usefulness' of the input state. 
+To address the sparse reward landscape inherent in Sokoban, we implement an AlphaGo-style architecture where tree search is guided by a policy network ($\pi_\theta$) and a value network ($V_\phi$). These functions operate on a state $s_t$ that has been preprocessed by a compression function $c$. The policy network outputs action logits $a_t$ to prioritize the search space, while the value network provides a scalar $v_t$ estimating the utility of the current state:
 
 $$a_t = \pi_\theta(c(s_t))$$
 
 $$v_t = V_\phi(c(s_t))$$
 
-In order to solve Sokoban puzzles, one must first understand the dataset. The dataset is Boxoban, a set of 9 million Sokoban puzzles in a 10x10 2d space. These levels can be used to yield solution trajectories using Breath First Search. The BFS search outputs pairs of puzzle state and correct actions. The idea is to pretrain the policy network and the value network using this solution BFS trajectory and finetune the value network with reinforcement learning in order to create an agent that can solve unseen sokoban levels more efficiently compared to MCTS or BFS.
+The agent is initialized through supervised learning on solution trajectories generated via Breadth-First Search (BFS). These trajectories consist of state-action pairs that define the optimal path to the goal. Following pretraining, the value network is refined using reinforcement learning and search bootstrapping to improve efficiency on unseen levels.
 
-Principle Component Analysis can reveal characteristics of values against each other. By performing Multilinear Principle Component Analysis on the solution trajectories, we can discover interesting features of the trajectories.
+\section{Trajectory Analysis via MPCA}
+Multilinear Principal Component Analysis (MPCA) is an effective feature extraction tool for tensor analysis. \cite{lu2008mpca} When applied to the Sokoban solution trajectory, it reveals that solution trajectories within the state space are not stochastic but follow a distinct curvilinear relationship. (See Figure \ref{fig:mpca_less})
 
 \begin{figure}[!ht] % [h] forces the image to be placed "here"
     \centering
     \includegraphics[width=1\textwidth]{images/mpca_less.png} 
-    \caption{MPCA visualization of a Boxoban solution trajectory. Each point represents a state $s_t$, with colors transitioning from start (dark) to finish (yellow). The curvilinear relationship demonstrates that states are sequentially dependent; this inherent temporal structure justifies the use of recurrent architectures (RNNs) or Transformers, which utilize a hidden state $h_{t-1}$ to provide the necessary contextual memory for accurate action prediction.}
+    \caption{MPCA visualization of a Boxoban solution trajectory. Each point represents a state $s_t$, with colors transitioning from start (dark) to finish (yellow). States that are not part of the solution is colored red. The curvilinear relationship demonstrates that states are sequentially dependent. This inherent temporal structure justifies the use of recurrent architectures (RNNs) or Transformers, which utilize a hidden state $h_{t-1}$ to provide the necessary contextual memory for accurate action prediction.}
     \label{fig:mpca_less}
 \end{figure}
 
-First, the graph reveals that solution steps of the same puzzle are more closely related to each other than to other puzzles. This may seem obvious due to the trajectories maintaining distinct wall structure through its multihot layers, however this becomes more relevant when considering another discovery.
+\begin{figure}[!ht] % [h] forces the image to be placed "here"
+    \centering
+    \includegraphics[width=1\textwidth]{images/mpca_global.png} 
+    \caption{MPCA visualization of multiple Boxoban solution trajectories. Each puzzles are clustered into different sets}
+    \label{fig:mpca_global}
+\end{figure}
 
-More importantly, most trajectories form a curve in the PCA space. With the starting state and the ending state being furthest in most puzzles, the trajectories form a curve. This is true when plotting a trajectory of a single level. This signifies that it is possible to predict the puzzle solution trajectory on the PCA space by fitting on the trajectory.
+The analysis indicates that steps within a single puzzle are more closely clustered than those across different puzzles, largely due to the persistence of static wall structures in the multi-hot input layers. More importantly, the smooth curve formed from the start to the goal state suggests that action prediction is highly context-dependent. To capture this temporal information, we introduce a hidden state $h_t$ to provide the networks with memory capacity:
 
-Since each trajectories are uniquely apart from each other while displaying strong curvilinear relation, one can conclude that the contextual data is critical for successfully predicting the solution move. This prompts the value function to become self-dependent to its previous state to have the memory capacity. This can be done in several methods such as using recurrent neural network or transformers. The value function can then be defined as follows.
+$$a_t, h_t = \pi_\theta(c(s_t), h_{t-1})$$
 
+$$v_t, h_t = V_\phi(c(s_t), h_{t-1})$$
 
-$$a_t, h_t = \pi_\theta(c(s_t) | h_{t-1})$$
+\section{Negative Data}
+However, the BFS trajectory data is not sufficient for the agent to determine a solution step and a non-solution step. As earlier studies emphasized, Sokoban presents a unique challenge in which some steps are irreversible and can softlock the game where the only possible move is to reset. A well-trained value function must be able to distinguish such states during the tree search phase to prune the nodes leading to the deadlock states. Similarly to earlier research where deadlock databased was used, we generated dataset of deadlock states and non-solution steps to feed to the value function pretraining as counter examples of the solution.
 
-$$v_t, h_t = V_\phi(c(s_t) | h_{t-1})$$
+\section{Input Type}
+Each state of the Sokoban puzzle can either be represented in multihot tensor or a human-readable image render of the gameplay. The type of input affects the effective input compression type.
 
 \section{Input Compression Stategies}
+To assist in training of the value and policy networks, we investigate the effect of three main input compression methods. The compressed inputs are fed through recurrent networks. All compression methods are compared against networks with no compression as a baseline.
 
 \subsection{CNN}
+CNN is often used for capturing local geometrical features through training kernels. By maintaining the spatial topology of the Sokoban grid, the CNN can extract patterns.
 
 \subsection{Autoencoder}
+Autoencoder is a popular input compression method where the encoder learns unrecoverable features from the input states through recreating the state from the compressed state. 
 
 \subsection{DCT}
-
+Often used in image compression, DCT transforms the 
 \section{Agent Architecture}
 
 \subsection{Policy Network}
 
 \subsection{Value Network}
 
+
+
+5.5 Input Compression Strategies
+
+In this section, you need to detail the mathematical and structural specifics of how the 10×10 Boxoban grid is reduced before reaching the neural networks.
+
+    5.5.1 CNN (Baseline): Describe the standard multi-headed convolutional neural network architecture used for action probability and plan length prediction. Explain that this serves as your benchmark for spatial pattern recognition.
+
+    5.5.2 Autoencoder: Detail the architecture of your encoder-decoder model. Explain how the grid state is mapped to a low-dimensional latent space (the "bottleneck") and then reconstructed, focusing on how these embeddings capture the "unrecoverable configurations" or deadlocks inherent in Sokoban.
+
+    5.5.3 DCT (Discrete Cosine Transform): Describe the process of converting grid data into the frequency domain. Highlight that this method aims to achieve higher scores with a lower total weight count in the neural networks by prioritizing low-frequency spatial features over noise.
+
+5.6 Agent Architecture (Implementation Details)
+
+While section 5.3 covers the theory, this section should cover the execution.
+
+    5.6.1 Policy Network: Describe the supervised learning process using BFS solution trajectories from Boxoban. Explain how the network learns to map a compressed state c(st​) to a specific action at​.
+
+    5.6.2 Value Network: Explain the reinforcement learning and bootstrapping process. Detail how the AlphaGo-styled tree search updates the value function Vϕ​ based on the results of rollouts and simulations to estimate state "usefulness".
+
+6.1 Results and Ablation
+
+This is the most critical missing data in your draft.
+
+    6.1.1 Ablation: Test the performance impact of removing specific components, such as training without the recurrent hidden state ht​. This proves whether the "curvilinear" trajectory information discovered in your MPCA analysis actually improves accuracy.
+
+    6.1.2 Results: Compare your findings against the A3C solve rate (60%) and the standard I2A solve rate (85%). Provide a table showing solve rates across different compression methods (CNN vs. Autoencoder vs. DCT) and their respective "weight counts".
+
+6.2 Discussion and Limitations
+
+    6.2.1 Interpretation: Discuss which compression strategy best handled the "Planning Depth" and "Sparse Reward" problems of Sokoban.
+
+    6.2.2 Limitations: Address the "irreversibility" of the game. Note if certain compression types caused the agent to miss subtle deadlocks, such as pushing a box into a wall or corner where it becomes immobile.
