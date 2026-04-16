@@ -1,33 +1,32 @@
 \section{Motivation}
 
+Sokoban occupies a distinctive position in artificial intelligence research. Unlike games such as chess or Go, where positions can be evaluated and mistakes can often be recovered from, Sokoban is a puzzle game where a wrong move can prevent the player from proceeding, often forcing a full reset. For example, a box can be permanently trapped in a corner or the player can be trapped by boxes. The irreversibility and the game's formal properties makes this game both NP-hard \cite{fryers1995sokoban} and PSPACE-complete \cite{culberson1997sokoban} placing it at the upper limits of complexity for discrete planning.
+
+Recent deep learning agents have achieved impressive results on Sokoban. The Imagination-Augmented Agent (I2A) developed by Google achieves a solve rate of 85\% on the Boxoban benchmark \cite{NEURIPS2017_7ca66fc0}, a dataset of 9 million procedurally generated levels. However, this performance comes at a significant computational cost: agents that achieve high solve rates typically rely on large models with many millions of parameters, demanding substantial memory and processing resources. As AI systems are increasingly expected to operate under resource constraints, the question arises of whether comparable planning ability can be achieved with a substantially smaller model.
+
+This thesis investigates that question by examining the role of input compression in neural network-guided search for Sokoban. Specifically, we evaluate whether compressing the board state representation before feeding it to the neural network heuristic can reduce the model's parameter count without a meaningful drop in solve rate.
+
 \section{Problem Statement}
+
+Sokoban presents two fundamental challenges that set it apart from most reinforcement learning benchmarks.
+
+The first is irreversibility. Every action in Sokoban is potentially permanent: once a box is pushed against a wall or into a corner that is not a goal position, it cannot be retrieved. This creates deadlock states from which the only escape is a full puzzle reset. A successful agent must therefore evaluate not only the immediate effect of each action but its consequences many steps into the future, making shallow strategies inadequate.
+
+The second challenge is sparse rewards. The agent receives no feedback signal until all boxes have been placed on their goal positions. In a $10 \times 10$ grid with multiple boxes and goals, reaching the solution purely by exploration is statistically unlikely, leaving standard reinforcement learning methods with almost no gradient signal to learn from in early training.
+
+Beyond these, the $10 \times 10$ multi-hot grid representation raises a concern about input dimensionality. The state encodes walls, boxes, goals, and the player position across separate binary channels, producing a high-dimensional input. Standard models applied to this input may be over-parameterized for the spatial scale of the problem. This motivates an investigation into whether frequency-domain transforms such as the Discrete Cosine Transform (DCT) or learned latent representations from an autoencoder can distill the spatially relevant structure into a more compact form without losing the information needed for planning.
 
 \section{Contributions}
 
+This thesis makes three primary contributions.
 
-1.1 Motivation
+First, we implement a DeepCubeA-style planning agent within the PuzzleJAX framework, a GPU-accelerated environment that enables training and evaluation across the full 9 million levels of the Boxoban dataset. The use of JAX and GPU parallelism makes large-scale experiments feasible within a practical time frame.
 
-    The "Holy Grail" of Planning: Explain that Sokoban is a primary benchmark for AI because it is NP-hard and PSPACE-complete, meaning it represents the upper limits of complexity in discrete planning.
+Second, we conduct a comparative evaluation of three input compression strategies applied to the Sokoban grid state before it is processed by the cost-to-go network: a convolutional neural network baseline, frequency-domain compression via the Discrete Cosine Transform, and latent-space compression via an autoencoder. For each strategy, we measure both the resulting solve rate and the total parameter count of the network, directly addressing the question of whether compression can improve parameter efficiency.
 
-    Resource Constraints: Highlight the growing need for efficient AI. While models like I2A achieve high success rates (85%), they often require massive computational resources. Your motivation is to see if we can maintain this performance while significantly reducing the "weight count" or memory footprint of the agent.
-
-1.2 Problem Statement
-
-    Sparse Rewards and Irreversibility: Define the core difficulties of the environment—namely that one wrong push can lead to an "unrecoverable configuration" (deadlock), and the agent rarely receives feedback until the puzzle is solved.
-
-    Input Dimensionality: Discuss the challenge of the 10×10 multi-hot grid. Explain that standard models might be "over-parameterized" for these grids, motivating your study into whether DCT or Autoencoders can distill the most vital spatial information for the policy and value networks.
-
-1.3 Contributions
-
-    PuzzleJAX Implementation: State that you have implemented these agents within the PuzzleJAX framework, utilizing GPU acceleration to handle the 9 million levels of the Boxoban dataset.
-
-    Comparative Analysis: Clarify that your primary contribution is the rigorous evaluation of different compression strategies—Frequency Domain (DCT) vs. Latent Space (Autoencoders)—and documenting their impact on an AlphaGo-style agent's ability to plan.
-
-    Trajectory Insights: Mention your use of MPCA to visualize and justify the move toward recurrent architectures (RNNs/Transformers) based on the curvilinear nature of solution paths.
-
-\begin{figure}[h] % [h] forces the image to be placed "here"
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{sokoban} 
+    \includegraphics[width=0.8\textwidth]{sokoban}
     \caption{Screenshot of Sokoban as seen on https://www.sokoban.jp/. The player character is wearing a yellow hardhat and pushing a box into a wall while surrounded by brick walls. The box needs to be placed on the red dot for solution.}
     \label{fig:sokoban}
 \end{figure}
