@@ -19,20 +19,26 @@
     \textbf{Abstract}
 \end{center}
 
-This thesis examines the role of input compression methods in improving agent performance
-within PuzzleJAX, a GPU-accelerated puzzle-solving benchmark for AI reasoning. Prior work in
-game-playing agents has shown that compressed input representations using the Discrete
-Cosine Transform (DCT) can outperform conventional reinforcement learning models by
-achieving a higher score with a lower weight count. This thesis extends these ideas to Boxoban,
-a Sokoban level dataset by Google. Previous studies have yet to explore input type and
-compression method on sokoban games, motivating the use of novel input compression
-techniques in the study.
+This thesis investigates whether neuroevolution can produce heuristic functions for Weighted
+A* search on Sokoban that are drastically more parameter-efficient than a conventional
+gradient-trained baseline. Sokoban is a combinatorial planning puzzle that is both NP-hard and
+PSPACE-complete, and solving it at scale requires an accurate cost-to-go heuristic to guide
+search. The standard approach fixes a neural network architecture and trains it by gradient
+descent; this thesis asks whether evolutionary search over network topology can find heuristics
+that are competitive in accuracy while using orders of magnitude fewer parameters.
 
+Three heuristic approaches are implemented and compared on the Boxoban benchmark, a
+dataset of 9 million procedurally generated $10\times10$ Sokoban levels released by Google.
+The CNN baseline is a fixed convolutional architecture with 2 million parameters trained by
+gradient descent on cost-to-go labels derived from Breadth-First Search solution trajectories.
+NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology and weights of a
+feed-forward heuristic from scratch, starting from approximately 26 parameters and growing
+complexity only where it improves prediction accuracy. CoDeepNEAT coevolves populations of
+network modules and blueprint topologies, combining evolutionary architecture search with
+per-genome gradient-descent weight training, producing assembled networks ranging from
+roughly 32,000 to 170,000 parameters.
 
-This project evaluates several input compression strategies, including frequency domain
-transforms and autoencoder embeddings. These compression techniques are used for training
-both the policy network and the value network. The policy network is trained on solution
-trajectory of Boxoban levels found through Breath First Search and the value network is trained
-with reinforcement learning, bootstrapping the policy network through AlphaGo-styled tree
-search. The findings highlight appropriate compression strategies that improve agent
-performance in planning-intensive tasks.
+All three approaches are evaluated by mean absolute error on cost-to-go prediction and by
+solve rate under Weighted A* search on held-out Boxoban levels. The results establish the
+degree to which neuroevolution can close the accuracy gap relative to the gradient-trained
+baseline while maintaining a substantial advantage in parameter count.

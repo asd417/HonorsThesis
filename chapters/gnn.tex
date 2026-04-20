@@ -1,0 +1,35 @@
+\section{Graph Neural Networks}
+
+Graph Neural Networks (GNNs) are a class of neural architectures designed to operate directly on graph-structured data, where information is encoded in both node features and the relational structure of edges connecting them. Introduced in their modern form by Scarselli et al. \cite{scarselli2009graph}, GNNs have since become the dominant approach for machine learning tasks where inputs exhibit relational or topological structure that cannot be adequately captured by grid-based or sequence-based architectures.
+
+\subsection{Message Passing Framework}
+
+The unifying computational mechanism underlying most GNN variants is \textit{message passing}, formalized by Gilmer et al. \cite{gilmer2017neural} as the Message Passing Neural Network (MPNN) framework. In message passing, each node $v$ in a graph $G = (V, E)$ maintains a feature vector $\mathbf{h}_v^{(k)}$ at layer $k$. At each layer, nodes aggregate information from their neighbors and update their own representations:
+
+$$\mathbf{m}_v^{(k+1)} = \bigoplus_{u \in \mathcal{N}(v)} M_k\!\left(\mathbf{h}_v^{(k)},\, \mathbf{h}_u^{(k)},\, \mathbf{e}_{uv}\right)$$
+
+$$\mathbf{h}_v^{(k+1)} = U_k\!\left(\mathbf{h}_v^{(k)},\, \mathbf{m}_v^{(k+1)}\right)$$
+
+where $\mathcal{N}(v)$ denotes the neighbors of $v$, $\mathbf{e}_{uv}$ is the feature of edge $(u, v)$, $M_k$ is a learnable message function, $\bigoplus$ is a permutation-invariant aggregation operator (such as sum or mean), and $U_k$ is a learnable update function. After $K$ rounds of message passing, a graph-level readout pools the node representations into a single fixed-size vector:
+
+$$\mathbf{h}_G = R\!\left(\left\{\mathbf{h}_v^{(K)} \mid v \in V\right\}\right)$$
+
+This computation is equivariant to permutations of the node ordering, making GNNs inherently suited to domains where there is no canonical ordering over relational entities --- a property directly relevant to Sokoban, where the assignment of boxes to goals is not fixed in advance.
+
+\subsection{Notable Architectures}
+
+Several influential GNN architectures have been proposed within the message passing framework:
+
+\textbf{Graph Convolutional Network (GCN).} Kipf and Welling \cite{kipf2017semi} introduced a spectral-domain graph convolution that propagates features through the normalized adjacency matrix. GCN applies a single linear transformation per layer followed by aggregation over neighbors, producing representations that reflect the local neighborhood structure around each node.
+
+\textbf{Graph Attention Network (GAT).} Veli\v{c}kovi\'{c} et al. \cite{velickovic2018graph} extended message passing with an attention mechanism that assigns learned importance weights to each neighbor's contribution during aggregation. This allows the network to focus on the most informative relational neighbors rather than averaging all of them uniformly, which is particularly valuable in graphs with heterogeneous edge types.
+
+\textbf{Graph Isomorphism Network (GIN).} Xu et al. \cite{xu2019how} established a theoretical connection between GNN expressiveness and the Weisfeiler-Lehman graph isomorphism test, proposing an architecture that achieves the maximum discriminative power achievable by any message-passing GNN by using a sum aggregator combined with a multi-layer perceptron update function.
+
+\subsection{Sokoban as a Graph}
+
+The Sokoban board admits a natural graph representation that exposes the relational structure of the planning problem in a form amenable to GNN processing. One formulation represents each non-wall cell as a node, with typed features indicating whether the cell is currently occupied by a box, a goal, the player, or is empty. Edges connect spatially adjacent cells, forming the spatial connectivity graph of the board. Under this representation, a GNN with $K$ message passing rounds can propagate information across paths of length $K$ in the board graph, allowing it to compute features that reflect the connectivity between boxes and their nearest reachable goals --- a key quantity for heuristic estimation.
+
+An alternative formulation introduces object nodes for each box and each goal, with edges encoding the shortest-path distance or reachability relationship between them. This object-centric graph explicitly represents the assignment problem at the heart of Sokoban: each box must be matched to exactly one goal, and the optimal assignment is a primary determinant of the heuristic cost. GNNs operating over this bipartite structure can learn to approximate minimum-cost matching without explicitly enumerating all possible assignments.
+
+Both representations are equivariant to the spatial symmetries of the board (rotation and reflection), meaning that a GNN trained on one orientation of a puzzle automatically generalizes to other orientations without requiring data augmentation --- a property that flat grid representations do not natively enjoy.
