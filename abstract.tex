@@ -30,7 +30,7 @@ that are competitive in accuracy while using orders of magnitude fewer parameter
 Three heuristic approaches are implemented and compared on the Boxoban benchmark, a
 dataset of 9 million procedurally generated $10\times10$ Sokoban levels released by Google.
 The CNN baseline is a fixed convolutional architecture with 2 million parameters trained by
-gradient descent on cost-to-go labels derived from Breadth-First Search solution trajectories.
+Adam optimizer on cost-to-go labels derived from Breadth-First Search solution trajectories.
 NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology and weights of a
 feed-forward heuristic from scratch, starting from approximately 26 parameters and growing
 complexity only where it improves prediction accuracy. CoDeepNEAT coevolves populations of
