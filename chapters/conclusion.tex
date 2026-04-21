@@ -1,3 +1,26 @@
 \section{Conclusion}
 
-\subsection{Future Works}
+This thesis investigated whether neuroevolution can produce cost-to-go heuristic functions
+for Weighted A* search on Boxoban that are substantially more parameter-efficient than a
+conventional gradient-trained CNN baseline. Three approaches were implemented and compared
+on 294 held-out levels: a fixed convolutional network with 2,031,809 parameters, a
+NEAT-evolved feed-forward network, and a CoDeepNEAT hybrid that combines evolutionary
+architecture search with gradient-descent weight training.
+
+The CNN baseline established a strong reference point, achieving a 97.3\% solve rate.
+NEAT produced a heuristic of just 24 parameters --- less than 0.002\% of the CNN's
+parameter count --- and achieved an 84.0\% solve rate. CoDeepNEAT, operating with
+32,000 to 170,000 parameters, achieved an 88.8\% solve rate. Both neuroevolved
+heuristics are meaningfully weaker than the CNN baseline, but the scale of the parameter
+reduction relative to the modest drop in solve rate suggests that neuroevolution is a
+viable strategy for heuristic compression.
+
+\subsection{Future Work}
+
+Several directions merit further investigation. Longer NEAT runs with larger populations
+may find topologies with greater expressive capacity without abandoning the parameter
+efficiency that makes the approach attractive. CoDeepNEAT could be extended to search
+over convolutional module types rather than dense-dropout blocks, which may better suit
+the spatial structure of the Sokoban grid. More broadly, the question of whether a
+neuroevolved heuristic can fully close the gap with the CNN baseline --- or whether the
+CNN's inductive structure provides an irreplaceable advantage --- remains open.

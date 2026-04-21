@@ -1,36 +1,107 @@
-\section{Motivation}
+\begin{center}
+    \vspace{0.9cm}
+    \textbf{Introduction}
+\end{center}
 
-Sokoban occupies a distinctive position in artificial intelligence research. Unlike games such as chess or Go, where positions can be evaluated and mistakes can often be recovered from, Sokoban is a puzzle game where a wrong move can prevent the player from proceeding, often forcing a full reset. For example, a box can be permanently trapped in a corner or the player can be trapped by boxes. The irreversibility and the game's formal properties makes this game both NP-hard \cite{fryers1995sokoban} and PSPACE-complete \cite{culberson1997sokoban} placing it at the upper limits of complexity for discrete planning.
+\section{Background and Motivation}
 
-A* search guided by a learned cost-to-go heuristic is one of the most effective general approaches to Sokoban. The heuristic estimates the number of steps remaining to the solution from any board state, and its accuracy directly determines how efficiently the search tree is explored. The dominant paradigm for learning such heuristics is to fix a neural network architecture --- typically a multi-layer convolutional or fully connected network --- and train its weights by gradient descent on supervised labels derived from solution trajectories. This approach is effective but has a significant drawback: gradient descent can only optimize within the fixed topology chosen before training. If that topology is overparameterized for the problem, the resulting heuristic wastes memory and computation; if it lacks the right inductive structure, no amount of training can compensate.
+Sokoban is a combinatorial planning puzzle invented by Hiroyuki Imabayashi in Japan in 1981.
+A player occupies a grid of cells containing walls, boxes, and goal positions, and must push
+every box onto a goal by moving up, down, left, or right. The rules are simple but its puzzles 
+can be extremely complex. Sokoban has been shown to be both NP-hard \cite{fryers1995sokoban} 
+and PSPACE-complete \cite{culberson1997sokoban}, placing it at the upper limits of complexity 
+for discrete planning problems.
 
-This thesis investigates an alternative: using neuroevolution to search over both the topology and the weights of the heuristic simultaneously. Rather than committing to an architecture in advance, evolutionary methods can discover the network structure that best fits the heuristic learning task, potentially finding solutions that are far more compact than those produced by gradient descent over a fixed architecture. The question motivating this work is whether a neuroevolved heuristic can match the accuracy of a hand-designed convolutional baseline while using orders of magnitude fewer parameters.
+The difficulty arises from two main properties. First, the game is irreversible. Once a box is 
+pushed against a wall or into a corner that is not a goal position, it can never be retrieved 
+since the player can not pull the box. This is a deadlock which forces the player to fully reset 
+(or undo depending on the version of the game). 
+The existence of deadlock constrains the agent from exploring the space stochastically as a 
+single incorrect move can invalidate all previous moves. This poses a significant challenge for 
+exploration-based agents which is the current standard of reinforcement learning. Second, rewards 
+are sparse. For a box to be pushed to the correct position, the agent must first perform long 
+list of actions which may or may not have a clear reward. An agent can always push the box towards a goal
+but this does not guarantee that the box can be pushed onto the goal from that specific direction. 
+The lack of accurate feedback means there is no gradient signal for a simple training based agents. 
+Together these properties make Sokoban a canonical stress-test for planning agents.
 
-\section{Problem Statement}
+\subsection*{A Brief History of Sokoban Solvers}
 
-Sokoban presents two fundamental challenges that set it apart from most reinforcement learning benchmarks.
+Early approaches to automated Sokoban solving, developed through the 1990s and early
+2000s, were largely rule-based. Solvers such as YASS \cite{damgaard_yass} and Sokoban++ \cite{wits_sokobanpp} 
+relied on handcrafted heuristics, deadlock tables, and macro-moves
 
-The first is irreversibility. Every action in Sokoban is potentially permanent: once a box is pushed against a wall or into a corner that is not a goal position, it cannot be retrieved. This creates deadlock states from which the only escape is a full puzzle reset. A successful agent must therefore evaluate not only the immediate effect of each action but its consequences many steps into the future, making shallow strategies inadequate.
 
-The second challenge is sparse rewards. The agent receives no feedback signal until all boxes have been placed on their goal positions. In a $10 \times 10$ grid with multiple boxes and goals, reaching the solution purely by exploration is statistically unlikely, leaving standard reinforcement learning methods with almost no gradient signal to learn from in early training.
+--- carefully enumerated patterns that allowed
+the solver to detect unsolvable states or to move boxes across the board in a single logical
+step. These systems achieved impressive results on the small curated puzzle sets of that
+era, but they required significant domain knowledge to implement and did not generalise
+beyond the configurations their designers had anticipated.
 
-Beyond these, the design of the heuristic function itself presents a practical challenge. A fixed convolutional architecture trained by gradient descent carries a parameter count determined by human design choices, not by the complexity of the task. The CNN baseline used in this work has 2,031,809 parameters, the majority of which reside in a single dense layer connecting the convolutional feature map to the hidden state. Whether all of these parameters contribute meaningfully to heuristic quality, or whether a much smaller network discovered by evolutionary search can achieve comparable accuracy, is the central empirical question of this thesis.
+The 2010s brought reinforcement learning methods to Sokoban. Deep Q-Networks and policy
+gradient agents \cite{NEURIPS2017_7ca66fc0} were applied to the puzzle, with some
+imagination-augmented architectures using a learned world model to simulate future states
+before committing to an action. These model-based agents demonstrated that a neural
+network could implicitly learn to plan ahead without handcrafted rules, but they remained
+sample-inefficient and struggled on the most complex instances.
+
+A more powerful paradigm emerged from work on the Rubik's Cube. Agostinelli et al.\
+\cite{agostinelli2019solving} showed that a deep neural network trained to predict the
+cost-to-go --- the minimum number of moves remaining to a solution --- could serve as the
+heuristic function in a Weighted A* search, enabling an agent to solve the Rubik's Cube
+optimally without any domain-specific knowledge. The network is trained by backward
+induction: starting from the solved state, random scrambles of increasing length produce
+training states, each labelled with the number of scrambles applied as its ground-truth
+cost-to-go. A subsequent work extended this framework to Sokoban and demonstrated that
+the same cost-to-go approach, guided by A* search, can solve highly complex puzzle
+instances \cite{agostinelli2021admissible}.
+
+\subsection*{The Boxoban Benchmark}
+
+Despite these advances, no study has applied the cost-to-go A* framework to Boxoban, a
+large-scale Sokoban dataset released by Google consisting of nine million procedurally
+generated $10\times10$ levels. Boxoban was created to benchmark agents that must plan
+over long horizons on a diverse distribution of puzzles, specifically to stress-test
+imagination-based planning models: approaches that use a learned world model to internally
+simulate or ``imagine'' sequences of future states before selecting an action
+\cite{NEURIPS2017_7ca66fc0}. In such models, the agent unrolls the world model forward
+from the current state, generating imaginary trajectories that it encodes alongside
+real observations to inform its policy. Because the world model is imperfect, the agent
+must learn to plan despite model errors --- making Boxoban's combinatorial depth and
+irreversibility an especially demanding test. The scale of nine million unique levels
+prevents any solver from memorising solutions and instead demands genuine generalisation
+across the full distribution of puzzle configurations.
 
 \section{Contributions}
 
-This thesis makes three primary contributions.
+This thesis makes three primary contributions. First, we implement a CNN baseline
+heuristic --- a fixed four-layer convolutional network with 2,031,809 parameters trained
+by gradient descent with an asymmetric Huber loss --- and evaluate its cost-to-go
+prediction accuracy and Weighted A* solve rate on Boxoban as the reference point for
+comparison.
 
-First, we implement a CNN baseline heuristic --- a fixed four-layer convolutional network with 2,031,809 parameters trained by gradient descent with an asymmetric Huber loss --- and establish its cost-to-go prediction accuracy and A* solve rate on the Boxoban benchmark as the reference point for comparison.
+Second, we apply NEAT \cite{stanley2002evolving} to evolve a feed-forward heuristic
+network from a minimal starting topology of approximately 26 parameters. NEAT searches
+simultaneously over network topology and weights, adding nodes and connections only where
+doing so improves the fitness signal, and uses speciation to protect structural innovations
+from premature elimination.
 
-Second, we apply NEAT to evolve a feed-forward heuristic network from a minimal starting topology of approximately 26 parameters. NEAT searches simultaneously over network topology and weights, adding nodes and connections only where doing so improves the negative-MAE fitness signal, and uses speciation to protect structural innovations from premature elimination. The evolved heuristic is expected to be several orders of magnitude smaller than the CNN baseline.
+Third, we apply CoDeepNEAT \cite{miikkulainen2019evolving} to coevolve populations of
+dense-dropout modules and blueprint topologies, with each assembled genome trained by
+gradient descent for a fixed number of epochs per generation. This hybrid approach
+combines the architectural flexibility of evolutionary search with the weight-optimisation
+efficiency of gradient descent, producing heuristics that are between 12$\times$ and
+63$\times$ smaller than the CNN baseline.
 
-Third, we apply CoDeepNEAT to coevolve populations of dense-dropout modules and blueprint topologies, with each assembled genome trained by gradient descent for a small number of epochs per generation. This hybrid approach combines the architectural flexibility of evolutionary search with the weight-optimization efficiency of gradient descent, producing heuristics in the range of 32,000 to 170,000 parameters --- between 12$\times$ and 63$\times$ smaller than the CNN baseline.
+All three heuristics are trained on cost-to-go labels derived from Breadth-First Search
+solution trajectories over the Boxoban dataset and evaluated on held-out levels by mean
+absolute error and Weighted A* solve rate.
 
-All three heuristics are trained on cost-to-go labels derived from Breadth-First Search solution trajectories over the Boxoban dataset and evaluated on held-out levels by mean absolute error and Weighted A* solve rate.
-
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{sokoban}
-    \caption{Screenshot of Sokoban as seen on https://www.sokoban.jp/. The player character is wearing a yellow hardhat and pushing a box into a wall while surrounded by brick walls. The box needs to be placed on the red dot for solution.}
+    \caption{A Sokoban puzzle. The player (yellow hardhat) must push the box (brown
+    square) onto the goal position (red dot) without trapping it against a wall or
+    corner. Screenshot from https://www.sokoban.jp/.}
     \label{fig:sokoban}
 \end{figure}

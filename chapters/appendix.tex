@@ -1,1 +1,165 @@
-Appendix goes here...
+%% ─── CNN Baseline ───────────────────────────────────────────────────────────
+
+\section{CNN Baseline Results}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{cnn/best_search_results}
+    \caption{CNN baseline: Weighted A* search results on held-out Boxoban levels. Solve rate: 97.3\% (286/294).}
+    \label{fig:cnn_search}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{cnn/training_curve}
+    \caption{CNN baseline training curve: validation MAE over training epochs.}
+    \label{fig:cnn_training}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{cnn/data_scaling_solve_rate}
+    \caption{CNN baseline solve rate as a function of training set size.}
+    \label{fig:cnn_scaling_solve}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{cnn/data_scaling_training}
+    \caption{CNN baseline training curves across different training set sizes.}
+    \label{fig:cnn_scaling_train}
+\end{figure}
+
+%% ─── CoDeepNEAT ─────────────────────────────────────────────────────────────
+
+\section{CoDeepNEAT Results}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{codeepneat/best_search_results}
+    \caption{CoDeepNEAT best genome: Weighted A* search results on held-out Boxoban levels. Solve rate: 88.8\% (261/294).}
+    \label{fig:codeepneat_search}
+\end{figure}
+
+%% ─── NEAT Sweep (New) ────────────────────────────────────────────────────────
+
+\section{NEAT Hyperparameter Sweep}
+
+The following tables and figures show results from the two NEAT ablation sweeps.
+Table~\ref{tab:neat_sweep_old} summarises the first sweep, which varied connection
+deletion probability, node mutation rates, stagnation limit, and weight mutation
+power across nine configurations. Table~\ref{tab:neat_sweep_new} shows the
+second sweep, which refined the three pruning configurations with a corrected
+full-dataset evaluation. All configurations used a population size of 150.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lccccr}
+\toprule
+\textbf{Config} & \texttt{conn\_del} & \texttt{node\_add/del} & \texttt{stagnation} & \texttt{wt\_power} & \textbf{Solve Rate} \\
+\midrule
+baseline    & 0.5 & 0.2 / 0.2 & 15 & 0.5 & 84.0\% \\
+prune\_light  & 0.3 & 0.2 / 0.2 & 15 & 0.5 & 84.7\% \\
+prune\_heavy  & 0.7 & 0.2 / 0.2 & 15 & 0.5 & 84.0\% \\
+node\_high    & 0.5 & 0.4 / 0.4 & 15 & 0.5 & 84.0\% \\
+node\_low     & 0.5 & 0.1 / 0.1 & 15 & 0.5 & 83.0\% \\
+stag\_25      & 0.5 & 0.2 / 0.2 & 25 & 0.5 & 84.0\% \\
+stag\_40      & 0.5 & 0.2 / 0.2 & 40 & 0.5 & 82.7\% \\
+wt\_fine      & 0.5 & 0.2 / 0.2 & 15 & 0.3 & 84.4\% \\
+wt\_coarse    & 0.5 & 0.2 / 0.2 & 15 & 0.8 & 84.7\% \\
+\bottomrule
+\end{tabular}
+\caption{NEAT sweep 1 (\_old): nine configurations and their A* solve rates.}
+\label{tab:neat_sweep_old}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lcr}
+\toprule
+\textbf{Config} & \texttt{conn\_delete\_prob} & \textbf{Solve Rate} \\
+\midrule
+baseline     & 0.5 & 84.0\% \\
+prune\_light  & 0.3 & 83.7\% \\
+prune\_heavy  & 0.7 & 84.7\% \\
+\bottomrule
+\end{tabular}
+\caption{NEAT sweep 2: pruning configurations with full-dataset evaluation.}
+\label{tab:neat_sweep_new}
+\end{table}
+
+\subsection*{Sweep 1 Graphs}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/baseline}
+    \caption{Sweep 1 — baseline (\texttt{conn\_del}=0.5, \texttt{stag}=15, \texttt{wt\_pow}=0.5). Solve rate: 84.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/prune_light}
+    \caption{Sweep 1 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 84.7\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/prune_heavy}
+    \caption{Sweep 1 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/node_high}
+    \caption{Sweep 1 — node\_high (\texttt{node\_add/del}=0.4). Solve rate: 84.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/node_low}
+    \caption{Sweep 1 — node\_low (\texttt{node\_add/del}=0.1). Solve rate: 83.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/stag_25}
+    \caption{Sweep 1 — stag\_25 (\texttt{max\_stagnation}=25). Solve rate: 84.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/stag_40}
+    \caption{Sweep 1 — stag\_40 (\texttt{max\_stagnation}=40). Solve rate: 82.7\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/wt_fine}
+    \caption{Sweep 1 — wt\_fine (\texttt{weight\_mutate\_power}=0.3). Solve rate: 84.4\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep_old/wt_coarse}
+    \caption{Sweep 1 — wt\_coarse (\texttt{weight\_mutate\_power}=0.8). Solve rate: 84.7\%.}
+\end{figure}
+
+\subsection*{Sweep 2 Graphs}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep/baseline}
+    \caption{Sweep 2 — baseline (\texttt{conn\_del}=0.5). Solve rate: 84.0\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep/prune_light}
+    \caption{Sweep 2 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 83.7\%.}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{neat_sweep/prune_heavy}
+    \caption{Sweep 2 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.7\%.}
+\end{figure}

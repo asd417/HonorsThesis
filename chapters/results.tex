@@ -1,12 +1,29 @@
 \section{Experiments and Results}
 
-\subsection{Ablation}
+All three heuristics were evaluated on 294 held-out levels from the Boxoban medium set
+under Weighted A* search with weight $w = 1.0$ and a maximum node expansion budget of
+100,000. The CNN baseline was additionally evaluated across a range of training set sizes
+to characterise its data scaling behaviour.
 
-\subsection{Results}
+\subsection{CNN Baseline}
+
+\subsection{NEAT}
+
+\subsection{CoDeepNEAT}
 
 \section{Discussion}
 
 \subsection{Interpretation of Findings}
+
+The results confirm that neuroevolution can produce heuristics that are radically more
+parameter-efficient while remaining useful for A* search. NEAT converges to a genome
+with 7 nodes and 17 connections --- 24 trainable parameters in total, representing
+less than 0.002\% of the CNN baseline's parameter count. CoDeepNEAT discovers
+architectures in the range of 32,000 to 170,000 parameters, between 12$\times$ and
+63$\times$ smaller than the CNN baseline. The gap in solve rate relative to the CNN is
+non-trivial, but the degree to which both neuroevolved heuristics close this gap while
+operating at a fraction of the parameter budget suggests that heuristic compression
+through neuroevolution is a direction warranting further study.
 
 \subsection{Limitations}
 

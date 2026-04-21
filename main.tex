@@ -11,14 +11,46 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{titlesec}
+\usepackage{tocloft}
 \usepackage{xeCJK}
 \setCJKmainfont{IPAMincho}
 
-\pagestyle{fancyplain}% <- use fancyplain instead fancy
+\pagestyle{fancyplain}
 \fancyhf{}
-\fancyhead[R]{\thepage}
+\fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
 \setlength{\headheight}{14pt}
+
+% Chapter: normal size, bold, centered — same style as Abstract heading
+\titleformat{\chapter}[block]{\normalfont\normalsize\bfseries\centering}{}{0em}{}
+\titlespacing*{\chapter}{0pt}{0.9cm}{1em}
+% Section: centered, not bold
+\titleformat{\section}{\normalfont\large\centering}{}{0em}{}
+% Subsection: bold, left-aligned
+\titleformat{\subsection}{\normalfont\large\bfseries}{}{0em}{}
+
+% TOC formatting to match template
+% "Contents" title: normal size, bold, centered, at top of page
+\renewcommand{\cfttoctitlefont}{\hfill\normalsize\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\contentsname}{Contents}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{1em}
+% Chapter entries: bold, no number prefix, dot leaders
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{0.3em}
+% Section entries: normal weight, indented
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\setlength{\cftsecindent}{1.5em}
+% Subsection entries: normal weight, further indented
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
+\setlength{\cftsubsecindent}{3.0em}
 
 \usepackage{multirow}
 \usepackage[style=numeric,sorting=none]{biblatex}
@@ -35,11 +67,13 @@
 
 \input{abstract}
 
+\clearpage
 \tableofcontents
 
 \doublespacing
 \pagenumbering{arabic} 
-\chapter{Introduction}
+\clearpage
+\addcontentsline{toc}{chapter}{Introduction}
 \input{chapters/introduction}
 
 \chapter{History of Sokoban}
