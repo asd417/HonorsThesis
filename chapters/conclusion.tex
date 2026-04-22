@@ -6,11 +6,22 @@ NEAT-evolved feed-forward network, and a CoDeepNEAT hybrid that combines evoluti
 architecture search with gradient-descent weight training.
 
 The CNN baseline established a strong reference point, achieving a 100\% solve rate
-on held-out levels within the 100{,}000 node expansion budget.
-NEAT produced a heuristic of just 24 parameters which is a 99.9988\% reduction in parameter count compared to the CNN baseline which achieved a 88.8\% solve rate, a competitive result considering the extreme reduction in model complexity.
-Both neuroevolved heuristics are meaningfully weaker than the CNN baseline, but the scale of the parameter
-reduction relative to the modest drop in solve rate suggests that neuroevolution is still a
-viable strategy for heuristic compression.
+on held-out levels within the 100{,}000 node expansion budget. NEAT produced a heuristic
+of just 24 parameters: a 99.9988\% reduction in parameter count compared to the CNN
+baseline while achieving an 84.0\% solve rate, a striking result considering the
+extreme reduction in model complexity. CoDeepNEAT, which coevolves dense-dropout modules
+and blueprint topologies and trains each assembled genome by gradient descent, discovered
+architectures in the 32{,}000 to 170{,}000 parameter range (between 12$\times$ and 63$\times$
+smaller than the CNN baseline) and achieved an 88.8\% solve rate, narrowing the gap to the
+CNN by combining evolutionary architecture search with gradient-based weight optimisation.
+
+Both neuroevolved heuristics are meaningfully weaker than the CNN baseline, but the scale
+of the parameter reduction relative to the modest drop in solve rate suggests that
+neuroevolution is still a viable strategy for heuristic compression. The relative
+performance order also suggests that the inclusion of
+gradient-based weight training within an evolutionary architecture search is a
+productive middle ground when pure topology evolution is too constrained but a
+fully hand-designed CNN is too parameter-heavy.
 
 \subsection{Future Work}
 
@@ -18,6 +29,6 @@ Several directions merit further investigation. Longer NEAT runs with larger pop
 may find topologies with greater expressive capacity without abandoning the parameter
 efficiency that makes the approach attractive. CoDeepNEAT could be extended to search
 over convolutional module types rather than dense-dropout blocks, which may better suit
-the spatial structure of the Sokoban grid. 
+the spatial structure of the Sokoban grid. One may also investigate applying convolutional layers to NEAT for potentially competitive results.
 
 The question of whether a neuroevolved heuristic function can match the performance of a CNN baseline heuristic remains an important question. An ideal discovery would be to find a neuroevolution method that can produce a complex heuristic function with less trainable weights than the CNN baseline, while maintaining a competitive solve rate.

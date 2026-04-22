@@ -1,6 +1,8 @@
 \section{Boxoban}
 
-All levels of the Boxoban puzzle set are constrained to a $10\times10$ grid, providing a standardized yet vast state space for evaluating an agent's ability to generalize across millions of unique configurations.
+All levels of the Boxoban puzzle set are constrained to a $10\times10$ grid, providing a standardized yet vast state space for evaluating an agent's ability to generalize across millions of unique configurations. Boxoban is partitioned by Google into \emph{unfiltered}, \emph{medium}, and \emph{hard} difficulty splits; this thesis draws every puzzle, both training and evaluation, from the \emph{medium} split, so both distributions are matched in difficulty.
+
+From the medium split, 14{,}000 puzzles were sampled and solved with the pruned BFS described in the next section to form the training set, and a disjoint set of 294 puzzles from the same medium split was held out as the evaluation set. Although Boxoban contains roughly nine million levels in total, this thesis does not use the full corpus: a CNN data-scaling sweep (Figure~\ref{fig:cnn_scaling_solve}) shows that solve rate plateaus once the training set reaches a few thousand levels, so 14{,}000 was chosen as a point well past the plateau while remaining tractable to solve with BFS within available compute. All three heuristics --- CNN, NEAT, and CoDeepNEAT --- are trained on the same 14{,}000-level training set and evaluated on the same 294-level held-out set, so any difference in solve rate reflects model capacity rather than data access.
 
 \section{Reverse Trajectory and Cost-to-Go Labels}
 
@@ -8,6 +10,13 @@ In order to generate the reverse trajectory for labelled cost-to-go dataset, a s
 To make BFS feasible, we implement a deadlock detection step that prunes any branch in which a box has been pushed into a corner position that is not a designated goal. Because such configurations are permanently unrecoverable, no solution can be found by continuing down that branch, and pruning it early avoids a large number of wasted node expansions. 
 
 Each BFS trajectory is a sequence of states from the initial configuration to the goal; state $s_i$ along a trajectory of length $T$ is assigned cost-to-go label $c_i = T - i$. The goal state receives label 0, the penultimate state receives label 1, and so on, so every state in the training set has an exact ground-truth cost-to-go.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{trajectory/level0_trajectory.png}
+    \caption{Visualisation of a BFS solution trajectory for a single Boxoban level. The blue square is the player, and the brown boxes are the boxes that needs to be pushed onto red goal positions. Green squares are the boxes on goal positions. Each frame shows a state along the path from initial configuration to goal; the cost-to-go label assigned to that state is the number of remaining frames. }
+    \label{fig:trajectory_viz}
+\end{figure}
 
 The resulting search produces compact, provably correct solution trajectories that serve as the supervised signal for training all three heuristic approaches. This provides a rich dataset of (state, cost-to-go) pairs for training heuristics to estimate the distance to solution from any given configuration. This approach to generating training data is directly inspired by the Autodidactic Iteration procedure of DeepCubeA \cite{agostinelli2019solving}. All three heuristic approaches are trained on the (state, cost-to-go) pairs. This reverse-trajectory strategy is well suited to A* heuristics because it guarantees ground-truth distance labels without any forward search. A subsequent extension of DeepCubeA applying the same principle to Sokoban demonstrated that the reverse-trajectory dataset is sufficient to train heuristics capable of solving highly complex instances \cite{agostinelli2021admissible}. This training data was used for all three following heuristic approaches, ensuring that any performance difference reflects the model's ability to learn from the same underlying signal rather than differences in data access or quality.
 
@@ -79,11 +88,10 @@ $500 \to 256 \to 128 \to 64 \to 1$ & $169{,}473$ \\
 
 Even the largest plausible CoDeepNEAT topology ($\sim$170K parameters) is more than $12\times$ smaller than the CNN baseline; the smallest ($\sim$32K) is more than $60\times$ smaller.
 
-\section{Fitness Functions}
+\section{Training Metrics}
 
-\paragraph{CNN.} Trained by gradient descent to minimize asymmetric Huber loss on batches of (state, cost-to-go) pairs, with overestimation penalized at $2\times$ to bias toward admissibility.
+The CNN was trained with a loss function for minimizing the Huber loss \cite{huber1992robust} on batches of (state, cost-to-go) pairs, with overestimation penalized at $2\times$ to bias toward admissibility. 
 
-\paragraph{NEAT.} Each genome evaluated on the full training set every generation. Fitness $= -\text{MAE}$.  Best genome by validation MAE is checkpointed.
+NEAT and CoDeepNEAT uses a fitness function to train the network either fully or partially. The fitness function of NEAT was $= -\text{MAE}$ and the best genome by validation MAE is checkpointed. 
 
-\paragraph{CoDeepNEAT.} Each assembled genome is gradient-trained for 5 epochs on a subsample of 8,192 states, then evaluated on the full validation set. Fitness $= 1/(1 + {val\_MAE})$.  Best model by validation MAE is checkpointed.
-
+CoDeepNEAT uses $MAE$ as the loss function for the gradient descent and uses $1/(1 + {val\_MAE})$ as the fitness function for evolving the network architecture with NEAT.

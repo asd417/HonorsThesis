@@ -12,8 +12,11 @@ search. The standard approach fixes a neural network architecture and trains it 
 descent; this thesis investigates whether evolutionary search over network topology can find heuristics
 that are competitive in accuracy while using orders of magnitude fewer parameters.
 
-Three heuristic approaches are implemented and compared on the Boxoban benchmark, a
-dataset of 9 million procedurally generated $10\times10$ Sokoban levels released by Google.
+Three heuristic approaches are implemented and compared on the medium-difficulty
+split of the Boxoban benchmark, a dataset of procedurally generated $10\times10$
+Sokoban levels released by Google. From the medium split, 14{,}000 puzzles are used
+for training and a disjoint 294 puzzles for held-out evaluation; the training set
+size was chosen at the empirical plateau of the CNN's data-scaling curve.
 The CNN baseline is a fixed convolutional architecture with 2 million parameters trained by
 Adam optimizer on cost-to-go labels derived from Breadth-First Search solution trajectories.
 NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology and weights of a  

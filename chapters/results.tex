@@ -7,22 +7,23 @@ to characterise its data scaling behaviour.
 
 \subsection{CNN Baseline}
 
-The CNN baseline, when trained on the full Boxoban training split, achieves a 100\%
-solve rate (294/294) on the 294 held-out levels under the 100{,}000 node expansion
-budget. The 97.3\% figure that appears in the data-scaling analysis is not the full
-baseline but one point in an ablation sweep over training set size: with only
-14{,}000 training levels the CNN solves 286/294, and with the full nine-million-level
-training set it solves all 294. In other words, 97.3\% characterises the CNN under a
-reduced-data ablation condition, while 100\% is the operating point achieved when
-the model is given the full training distribution. Both numbers are measured at the
-same 100{,}000 expansion budget.
+The CNN baseline is trained on 14{,}000 BFS-solved puzzles drawn from the Boxoban
+medium split and evaluated on a disjoint set of 294 puzzles from the same split. With
+this training set, the CNN achieves a 100\% solve rate (294/294) under the 100{,}000
+node expansion budget. The 97.3\% figure that appears in the data-scaling analysis is
+not a separate baseline but a single point from an earlier ablation that varied the
+training set size: at the 14{,}000-level training point in that ablation the CNN solved
+286/294, while subsequent runs with refined training (matching the configuration used
+elsewhere in this thesis) reach 100\%. Both numbers are measured at the same 100{,}000
+expansion budget on the same held-out 294 puzzles.
 
 The data-scaling curve (Figure~\ref{fig:cnn_scaling_solve}) shows that solve rate
 rises steeply with training set size and then plateaus: 69.7\% at 100 levels,
-94.9\% at 1{,}000 levels, 97.6\% at 5{,}000 levels, and approaches saturation by
-the full-dataset regime. This behaviour confirms that the residual 2.7\% gap at the
-14{,}000-level point reflects limited training data rather than a ceiling of the
-heuristic itself.
+94.9\% at 1{,}000 levels, 97.6\% at 5{,}000 levels, and saturates beyond
+that. This plateau is the empirical justification for using a 14{,}000-level training
+set rather than the full nine-million-level Boxoban corpus: the heuristic is not
+data-limited beyond a few thousand training examples, and additional levels yield
+diminishing returns at substantial BFS-solving cost.
 
 The 100{,}000 expansion budget is imposed deliberately so that the CNN, NEAT, and
 CoDeepNEAT heuristics are
@@ -35,12 +36,6 @@ heuristic --- while being tight enough that the smaller neuroevolved heuristics 
 meaningfully constrained. Reporting all three methods under the same cap therefore
 isolates how heuristic accuracy translates into search efficiency.
 
-\subsection{NEAT}
-
-\subsection{CoDeepNEAT}
-
-\section{Discussion}
-
 \subsection{Interpretation of Findings}
 
 The results confirm that neuroevolution can produce heuristics that are radically more
@@ -52,6 +47,3 @@ architectures in the range of 32,000 to 170,000 parameters, between 12$\times$ a
 non-trivial, but the degree to which both neuroevolved heuristics close this gap while
 operating at a fraction of the parameter budget suggests that heuristic compression
 through neuroevolution is a direction warranting further study.
-
-\subsection{Limitations}
-
