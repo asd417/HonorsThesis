@@ -12,14 +12,8 @@ Groshev et al. demonstrated that a deep neural network can learn and represent a
 
 \subsection{Forward-Backward Reinforcement Learning}
 
-Shoham et al. \cite{shoham2021solving} addressed the sparse reward problem in Sokoban by training two complementary networks: a backward-facing model and a forward-facing model. Because reward in Sokoban is only received when all boxes are on goal positions, the backward model is initialized at the goal state and trained on a reversed task --- pulling boxes away from goals rather than pushing them towards them. This reversed task provides dense reward early in training and allows the agent to learn a backward value function $V_B$ efficiently. From this function, a backward trajectory $T$ is constructed for each puzzle instance by initializing at the goal state and using a planning algorithm to find the path that maximizes $V_B$.
+Shoham et al. \cite{shoham2021solving} addressed the sparse reward problem in Sokoban by training two complementary networks: a backward-facing model and a forward-facing model. Because reward in Sokoban is only received when all boxes are on goal positions, the backward model is initialized at the goal state and trained on a reversed task by pulling boxes away from goals rather than pushing them towards them. This reversed task provides dense reward early in training and allows the agent to learn a backward value function $V_B$ efficiently. From this function, a backward trajectory $T$ is constructed for each puzzle instance by initializing at the goal state and using a planning algorithm to find the path that maximizes $V_B$.
 
 The forward-facing value function $V_F$ then conditions on both the current state $s$ and instance-specific hint features derived from the backward trajectory $T$. This conditioning partially alleviates the sparsity of the forward reward signal by providing structural information about where boxes should ultimately be placed. The authors note that despite this novel approach, classical IDA* search still provides the strongest overall performance among the methods compared, underscoring the continued relevance of principled heuristic search for Sokoban.
 
 \input{chapters/i2a-boxoban.tex}
-
-\section{Evolutionary Approaches}
-
-The approaches surveyed above share a common design choice: the heuristic or policy network is fixed in architecture and trained by gradient descent. An alternative paradigm treats the architecture itself as a variable to be optimized through evolutionary computation. The following section surveys this direction.
-
-\input{chapters/neat.tex}

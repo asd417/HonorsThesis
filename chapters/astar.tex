@@ -1,4 +1,5 @@
 \section{A* Search}
+
 A* is a best-first graph search algorithm that finds the least-cost path from an initial state to a goal state. \cite{hart1968formal} Unlike Breadth-First Search, which expands nodes uniformly by depth, A* prioritizes nodes using an evaluation function that combines the cost already incurred with an estimate of the remaining cost to the goal:
 
 $$f(n) = g(n) + h(n)$$
@@ -10,6 +11,7 @@ The correctness of A* depends on the admissibility of the heuristic. A heuristic
 The practical performance of A* is determined largely by the quality of $h$. A tight heuristic directs the search along the optimal path with minimal node expansions, while a weak one causes the frontier to grow combinatorially. For complex combinatorial domains such as Sokoban, designing an admissible heuristic that accurately approximates true cost is difficult due to intricate interactions between boxes, walls, and goals. This motivates replacing the hand-crafted heuristic with a learned approximation via a deep neural network.
 
 \section{DeepCubeA}
+
 DeepCubeA, proposed by Agostinelli et al. \cite{agostinelli2019solving}, replaces the hand-crafted heuristic in A* with a deep neural network $h_\theta$ trained to estimate the cost-to-go from any state to the goal. The network is trained through a self-supervised procedure called \textit{Autodidactic Iteration}: beginning from the solved (goal) state, random sequences of actions of increasing length are applied to generate scrambled states. At each depth $d$, the network learns to predict $d$ as the cost-to-go from the resulting state. This backward induction scheme produces a heuristic that approximates true distance across the reachable state space without any hand-engineered domain knowledge.
 
 At inference time, DeepCubeA uses Weighted A* (WA*), scaling the learned heuristic by a weight $w \geq 1$:
