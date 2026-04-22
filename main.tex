@@ -1,5 +1,6 @@
 \documentclass[11pt]{report}
 \usepackage[utf8]{inputenc}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \graphicspath{ {images/} }
 \usepackage{caption}
@@ -14,6 +15,10 @@
 \usepackage{titlesec}
 \usepackage{tocloft}
 \usepackage{xeCJK}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks
+}
 \setCJKmainfont{IPAMincho}
 
 \pagestyle{fancyplain}
@@ -56,7 +61,7 @@
 \usepackage[style=numeric,sorting=none]{biblatex}
 \addbibresource{references.bib}
 
-\title{Sokoban: History and AI}
+\title{Reducing Parameter Count of Heuristic Function for Generalized Solution of Sokoban puzzles}
 \author{Yeonghun Lee}
 \date{2026}
 
@@ -76,6 +81,16 @@
 \addcontentsline{toc}{chapter}{Introduction}
 \input{chapters/introduction}
 
+\chapter{Background}
+
+Before delving into the specific methodologies and results of this thesis, it is important to establish the foundational concepts and prior work that inform our approach. This chapter provides an overview of the key algorithms and techniques that underpin our Sokoban-solving agents, including A* search, convolutional neural networks (CNNs), NeuroEvolution of Augmenting Topologies (NEAT), and CoDeepNEAT. Each section contextualizes these methods within the broader landscape of AI research and highlights their relevance to our Sokoban-solving framework.
+
+\input{chapters/astar.tex}
+\input{chapters/CNN.tex}
+\input{chapters/neat.tex}
+\input{chapters/codeepneat.tex}
+\input{chapters/deepcubea.tex}
+
 \chapter{History of Sokoban}
 \input{chapters/HistoryOfSokoban}
 
@@ -85,10 +100,6 @@
 \chapter{Solving Sokoban}
 \input{chapters/solvingsokoban}
 
-\chapter{Background}
-\input{chapters/neat.tex}
-\input{chapters/codeepneat.tex}
-\input{chapters/deepcubea.tex}
 
 \chapter{Methodology}
 \input{chapters/methodology}

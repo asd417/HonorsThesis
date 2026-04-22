@@ -1,12 +1,11 @@
 \section{I2A and Boxoban}
-In 2017, Google researchers introduced a novel architecture \cite{NEURIPS2017_7ca66fc0} for reinforcement learning (RL) that bridges the gap between model-free and model-based approaches. Unlike standard agents that react directly to the environment, Imagination-Augmented Agents (I2As) learn to "imagine" future steps using an internal, potentially imperfect environment model. Instead of predicting an action solely from the current state, the agent first samples several future scenarios and interprets these trajectories to inform its next move.
+In 2017, Google researchers introduced a novel architecture \cite{NEURIPS2017_7ca66fc0} for reinforcement learning (RL) that bridges the gap between model-free and model-based approaches. Unlike standard agents that react directly to the environment, Imagination-Augmented Agents (I2As) learn to "imagine" future steps using an internal, potentially imperfect environment model. The agent uses the environment model to sample several future trajectories to inform its next move.
 
 Classical planning methods, such as Monte Carlo Tree Search (MCTS), expand search branches based on a model's predictions, which typically requires the model to be perfectly accurate. I2As circumvent this limitation by using an encoder to extract meaningful features from simulated trajectories, making the system significantly more robust to model inaccuracies or failures.
 
 The I2A architecture consists of three major components.
 
 First is the Imagination Core(IC). IC is a type of model that is now more commonly known as World Model.\cite{worldmodel} This model is pretrained on trajectories of the environment. The transition model $M$ takes the current observation $s_t$ and a proposed action $a_t$ to predict the subsequent state $s_{t+1}$ and the immediate reward $r_{t+1}$
-
 
 \[M(s_{t+1},\ r_{t+1}|s_t,\ a_t)\]
 

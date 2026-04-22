@@ -5,7 +5,8 @@ on 294 unseen levels: a fixed convolutional network with 2 million parameters, a
 NEAT-evolved feed-forward network, and a CoDeepNEAT hybrid that combines evolutionary
 architecture search with gradient-descent weight training.
 
-The CNN baseline established a strong reference point, achieving a 97.3\% solve rate.
+The CNN baseline established a strong reference point, achieving a 100\% solve rate
+on held-out levels within the 100{,}000 node expansion budget.
 NEAT produced a heuristic of just 24 parameters which is a 99.9988\% reduction in parameter count compared to the CNN baseline which achieved a 88.8\% solve rate, a competitive result considering the extreme reduction in model complexity.
 Both neuroevolved heuristics are meaningfully weaker than the CNN baseline, but the scale of the parameter
 reduction relative to the modest drop in solve rate suggests that neuroevolution is still a

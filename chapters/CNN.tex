@@ -1,0 +1,20 @@
+\section{Convolutional Neural Networks}
+
+Convolutional Neural Networks (CNNs) \cite{lecun1998gradient} are a class of deep learning models designed to automatically and adaptively learn spatial hierarchies of features from input data. While early architectures focused on character recognition, the breakthrough of \textbf{AlexNet} \cite{krizhevsky2012imagenet} demonstrated that deep CNNs could scale to complex visual tasks through the use of GPUs and non-linear activations.
+
+While standard multilayer perceptrons (MLPs) struggle with the high dimensionality of raw grid data, CNNs leverage local receptive fields and weight sharing to maintain spatial relationships, making them particularly effective for game boards like Sokoban. The fundamental operation of a CNN is the discrete convolution. In the context of a convolutional layer, the input is typically represented as a 3D multi-hot tensor $I \in \mathbb{R}^{H \times W \times C}$, where $H$ and $W$ are the spatial dimensions and $C$ represents the depth or feature planes (e.g., specific object types in a Sokoban state). The layer consists of a set of learnable kernels $K$, where each kernel has a smaller spatial extent than the input but spans the same depth.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{cnn.png}
+    \caption{Architecture of a typical Deep Learning CNN, showing the transition from input through convolutional and pooling layers to the final output \cite{dahouda2024deep}.}
+    \label{fig:cnn_architecture}
+\end{figure}
+
+The output of a 3D convolutional layer, known as a feature map $\mathcal{O}^{(k)}$, is computed by sliding a cubic kernel over the input volume. For a 3D input $I$ and a 3D kernel $K$, the value at position $(i, j, l)$ of the output feature map is given by the cross-correlation operation:
+$$(I * K)_{i,j,l} = \sum_{m=0}^{h-1} \sum_{n=0}^{w-1} \sum_{p=0}^{c-1} I_{i+m, j+n, l+p} \cdot K_{m, n, p}$$
+In a deep learning context, this is typically augmented with a learnable bias $b^{(k)}$ and passed through a non-linear activation function $\sigma$, such as the Rectified Linear Unit (ReLU):
+$$a_{i,j,l}^{(k)} = \sigma \left( \sum_{m=0}^{h-1} \sum_{n=0}^{w-1} \sum_{p=0}^{c-1} I_{i+m, j+n, l+p} \cdot \mathcal{W}_{m, n, p}^{(k)} + b^{(k)} \right)$$
+This process allows the network to achieve translation invariance; because the same weights ($\mathcal{W}^{(k)}$) are applied across the entire input, the network can recognize a "box" or a "target" regardless of its specific coordinates on the Sokoban grid.
+
+The result is a trainable network that performs a linear transformation from the input to the feature space, followed by a non-linear transformation to the output space for various tasks ranging from classification to regression.
