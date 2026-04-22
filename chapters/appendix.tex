@@ -4,28 +4,28 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{cnn/best_search_results}
+    \includegraphics[width=1\textwidth]{cnn/best_search_results}
     \caption{CNN baseline: Weighted A* search results on held-out Boxoban levels. Solve rate: 97.3\% (286/294).}
     \label{fig:cnn_search}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{cnn/training_curve}
+    \includegraphics[width=1\textwidth]{cnn/training_curve}
     \caption{CNN baseline training curve: validation MAE over training epochs.}
     \label{fig:cnn_training}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{cnn/data_scaling_solve_rate}
+    \includegraphics[width=1\textwidth]{cnn/data_scaling_solve_rate}
     \caption{CNN baseline solve rate as a function of training set size.}
     \label{fig:cnn_scaling_solve}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{cnn/data_scaling_training}
+    \includegraphics[width=1\textwidth]{cnn/data_scaling_training}
     \caption{CNN baseline training curves across different training set sizes.}
     \label{fig:cnn_scaling_train}
 \end{figure}
@@ -36,7 +36,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{codeepneat/best_search_results}
+    \includegraphics[width=1\textwidth]{codeepneat/best_search_results}
     \caption{CoDeepNEAT best genome: Weighted A* search results on held-out Boxoban levels. Solve rate: 88.8\% (261/294).}
     \label{fig:codeepneat_search}
 \end{figure}
@@ -92,74 +92,75 @@ prune\_heavy  & 0.7 & 84.7\% \\
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/baseline}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/baseline}
     \caption{Sweep 1 — baseline (\texttt{conn\_del}=0.5, \texttt{stag}=15, \texttt{wt\_pow}=0.5). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/prune_light}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/prune_light}
     \caption{Sweep 1 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 84.7\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/prune_heavy}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/prune_heavy}
     \caption{Sweep 1 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/node_high}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/node_high}
     \caption{Sweep 1 — node\_high (\texttt{node\_add/del}=0.4). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/node_low}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/node_low}
     \caption{Sweep 1 — node\_low (\texttt{node\_add/del}=0.1). Solve rate: 83.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/stag_25}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/stag_25}
     \caption{Sweep 1 — stag\_25 (\texttt{max\_stagnation}=25). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/stag_40}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/stag_40}
     \caption{Sweep 1 — stag\_40 (\texttt{max\_stagnation}=40). Solve rate: 82.7\%.}
 \end{figure}
 
+\begin{center}
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/wt_fine}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/wt_fine}
     \caption{Sweep 1 — wt\_fine (\texttt{weight\_mutate\_power}=0.3). Solve rate: 84.4\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep_old/wt_coarse}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/wt_coarse}
     \caption{Sweep 1 — wt\_coarse (\texttt{weight\_mutate\_power}=0.8). Solve rate: 84.7\%.}
 \end{figure}
-
+\end{center}
 \subsection*{Sweep 2 Graphs}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep/baseline}
+    \includegraphics[width=1\textwidth]{neat_sweep/baseline}
     \caption{Sweep 2 — baseline (\texttt{conn\_del}=0.5). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep/prune_light}
+    \includegraphics[width=1\textwidth]{neat_sweep/prune_light}
     \caption{Sweep 2 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 83.7\%.}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{neat_sweep/prune_heavy}
+    \includegraphics[width=1\textwidth]{neat_sweep/prune_heavy}
     \caption{Sweep 2 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.7\%.}
 \end{figure}

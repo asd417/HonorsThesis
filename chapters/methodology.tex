@@ -1,10 +1,9 @@
-\section{PuzzleJAX}
-The PuzzleJAX framework, developed by Julian Togelius et al., represents a significant shift in how puzzle-solving agents are trained and evaluated in artificial intelligence research. It is a high-performance, GPU-accelerated benchmark designed specifically to facilitate AI reasoning within combinatorial puzzle environments. By leveraging the JAX library, the framework allows for massive parallelism and end-to-end differentiability, enabling the simulation of thousands of environments simultaneously on a single accelerator.
-
 \section{Boxoban}
+
 The PuzzleJAX environment is utilized to load the Boxoban dataset, a collection of 9 million procedurally generated Sokoban levels released by Google. These levels are constrained to a $10\times10$ grid, providing a standardized yet vast state space for evaluating an agent's ability to generalize across millions of unique configurations.
 
 \section{Pruning Breadth-First Search}
+
 Generating solution trajectories for the Boxoban dataset requires a search method that is both complete and practical at scale. A standard breadth-first search applied to the full Sokoban state space is computationally intractable because many branches lead to deadlock configurations that can never reach a solution, causing the search frontier to grow unnecessarily large. To make BFS feasible, we implement a deadlock detection step that prunes any branch in which a box has been pushed into a corner position that is not a designated goal. Because such configurations are permanently unrecoverable, no solution can be found by continuing down that branch, and pruning it early avoids a large number of wasted node expansions. The resulting search produces compact, provably correct solution trajectories that serve as the supervised signal for training all three heuristic approaches.
 
 \section{Trajectory and Divergent Trajectory}
