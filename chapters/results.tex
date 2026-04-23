@@ -36,6 +36,22 @@ heuristic --- while being tight enough that the smaller neuroevolved heuristics 
 meaningfully constrained. Reporting all three methods under the same cap therefore
 isolates how heuristic accuracy translates into search efficiency.
 
+\subsection{NEAT Failure Analysis}
+
+The NEAT heuristic solves 84.0\% of the 294 held-out levels (see Appendix
+\ref{app:neat_sweeps}), leaving 47 unsolved. Because every run is capped at the
+same 100{,}000-expansion budget used for the CNN, failure is overwhelmingly
+attributable to heuristic inaccuracy rather than compute starvation: the 24-parameter
+genome produces coarse cost-to-go estimates that mislead the search priority, causing
+A* to expand large regions of the state space around misleading local minima before
+either finding a solution or exhausting the budget. This is the expected failure
+mode for an extremely compact heuristic --- the network lacks the capacity to
+distinguish structurally similar states whose true cost-to-go differs sharply, so
+the search cannot rank successors reliably near deadlock-adjacent configurations.
+Raising the expansion budget would recover some of these levels, but the comparison
+in this thesis deliberately fixes the budget so that heuristic quality, not search
+effort, is what varies across methods.
+
 \subsection{Interpretation of Findings}
 
 The results confirm that neuroevolution can produce heuristics that are radically more
