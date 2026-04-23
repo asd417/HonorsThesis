@@ -23,11 +23,11 @@ The resulting search produces compact, provably correct solution trajectories th
 
 \section{Heuristic Approaches}
 
-The three approaches share the same input representation and evaluation process. The input to each heuristic is the flattened multi-hot grid state $s_t \in \{0,1\}^{500}$, a $(5 \times 10 \times 10)$ binary tensor encoding walls, boxes, goals, and the player. Each heuristic outputs a scalar estimate $\hat{h}(s_t)$ of the remaining steps to solution. Node expansion during Weighted A* search is prioritized by:
+The three approaches share the same input representation and evaluation process. The input to each heuristic is the flattened multi-hot grid state $s_t \in \{0,1\}^{500}$, a $(5 \times 10 \times 10)$ binary tensor encoding walls, boxes, goals, and the player. Each heuristic outputs a scalar estimate $\hat{h}(s_t)$ of the remaining steps to solution. Node expansion during A* search is prioritized by:
 
 $$f(s_t) = g(s_t) + w \cdot \hat{h}(s_t)$$
 
-where $g(s_t)$ is the cost incurred from the start and $w \geq 1$ trades solution optimality for search speed. All evaluations in this thesis use $w = 1.0$, reducing Weighted A* to standard A*; this preserves optimality when the heuristic is admissible and isolates differences in solve rate and expansion count to heuristic quality rather than search-time inflation. The three approaches differ in how $\hat{h}$ is parameterized and optimized.
+where $g(s_t)$ is the cost incurred from the start and $w \geq 1$ trades solution optimality for search speed. All evaluations in this thesis use $w = 1.0$, reducing A* to standard A*; this preserves optimality when the heuristic is admissible and isolates differences in solve rate and expansion count to heuristic quality rather than search-time inflation. The three approaches differ in how $\hat{h}$ is parameterized and optimized.
 
 \subsection{CNN Baseline}
 

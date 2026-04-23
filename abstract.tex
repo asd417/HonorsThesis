@@ -4,8 +4,7 @@
     \textbf{Abstract}
 \end{center}
 
-This thesis investigates whether neuroevolution can produce heuristic functions for Weighted
-A* search on Sokoban that are drastically more parameter-efficient than a conventional
+This thesis investigates whether neuroevolution can produce heuristic functions for A* search on Sokoban that are drastically more parameter-efficient than a conventional
 gradient-trained baseline. Sokoban is a combinatorial planning puzzle that is both NP-hard and
 PSPACE-complete, and solving it at scale requires an accurate cost-to-go heuristic to guide
 search. The standard approach fixes a neural network architecture and trains it by gradient
@@ -27,6 +26,6 @@ per-genome gradient-descent weight training, producing assembled networks rangin
 roughly 32,000 to 170,000 parameters.
 
 All three approaches are evaluated by mean absolute error on cost-to-go prediction and by
-solve rate under Weighted A* search on held-out Boxoban levels. The results establish the
+solve rate under A* search on held-out Boxoban levels. The results establish the
 degree to which neuroevolution can close the accuracy gap relative to the gradient-trained
 baseline while maintaining a substantial advantage in parameter count.
