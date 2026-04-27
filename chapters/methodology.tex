@@ -2,32 +2,7 @@
 
 All levels of the Boxoban puzzle set are constrained to a $10\times10$ grid, providing a standardized yet vast state space for evaluating an agent's ability to generalize across millions of unique configurations. Boxoban is partitioned by Google into \emph{unfiltered}, \emph{medium}, and \emph{hard} difficulty splits; this thesis draws every puzzle, both training and evaluation, from the \emph{medium} split, so both distributions are matched in difficulty.
 
-From the medium split, 14{,}000 puzzles out of the full 9 million corpus were sampled and solved with the pruned BFS described in the next section to form the training set, and a disjoint set of 294 puzzles from the same medium split was held out as the evaluation set. A CNN data-scaling sweep (Figure~\ref{fig:cnn_scaling_solve}) shows that solve rate plateaus once the training set reaches a few thousand levels, so 14{,}000 was chosen as a point well past the plateau while remaining tractable to solve with BFS within available compute. All three heuristics (CNN, NEAT, and CoDeepNEAT) are trained on the same 14{,}000-level training set and evaluated on the same 294-level held-out set, so any difference in solve rate reflects model capacity rather than data access.
-
-\section{Forward BFS Trajectories and Cost-to-Go Labels}
-
-Training labels are derived directly from forward breadth-first search (BFS) solutions. For each Boxoban puzzle, BFS expands states outward from the initial configuration until it reaches a goal state, producing a shortest-path trajectory $s_0, s_1, \dots, s_T$ where $s_0$ is the given initial state and $s_T$ is the first goal state encountered. No backward or reverse-move generation is performed: every state used for training comes from a real forward solution, and the labeling pass walks that trajectory once the goal is reached.
-
-A standard BFS applied to the full Sokoban state space is computationally intractable because many branches lead to deadlock configurations that can never reach a solution, causing the search frontier to grow unnecessarily large. To make forward BFS feasible, three pruning mechanisms are applied during expansion, each one cheap enough to evaluate inline on every successor:
-
-\begin{itemize}
-    \item \textbf{Dead-square precomputation.} Before search begins, a backward reachability pass is run from every goal cell: a square is marked \textit{live} if there exists some box position and matching player position from which a box could be pushed onto it and then on to a goal, and every remaining non-wall square is marked \textit{dead}. Any successor state that places a box on a dead square is immediately pruned, because no sequence of legal pushes from that configuration can deliver that box to a goal. This is strictly stronger than corner-only detection, since it also catches wall-hugging squares with no goal along the wall segment.
-    \item \textbf{Frozen 2$\times$2 deadlock detection.} After every box-pushing move, the successor state is scanned for any $2\times 2$ block in which all four cells are either walls or boxes. If such a block contains at least one box not on a goal, the configuration is a permanent deadlock (none of those boxes can ever move again) and the branch is pruned. This check is only invoked when the most recent action actually pushed a box, so it adds no cost to pure player-movement transitions.
-    \item \textbf{Reverse-move pruning.} If the last action was a player move that did \textit{not} push a box, the immediately opposite action is forbidden from the successor set. This removes the trivial back-and-forth symmetry in which the agent walks one step and undoes it, without affecting solution completeness (any state reachable via a reverse move is also reachable by the preceding state with that move omitted).
-\end{itemize}
-
-In addition to these pruning rules, BFS deduplicates by a state hash over the player position and box positions, so identical configurations reached by different action sequences are expanded at most once. Together these mechanisms keep the frontier small enough that medium-split puzzles solve within a half-million-node budget.
-
-Once the goal is reached, the solution trajectory is traversed and each state is labeled with the number of steps remaining until solution. Formally, state $s_i$ along a trajectory of length $T$ is assigned cost-to-go label $c_i = T - i$ so that the goal state $s_T$ receives label 0, and the initial state receives label $T$. Because BFS returns a shortest path under uniform step cost, these labels are the exact ground-truth cost-to-go for every state on the trajectory.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{trajectory/level0_trajectory.png}
-    \caption{Visualization of a BFS solution trajectory for a single Boxoban level. The blue square is the player, and the brown boxes are the boxes that needs to be pushed onto red goal positions. Green squares are the boxes on goal positions. Each frame shows a state along the path from initial configuration to goal; the cost-to-go label assigned to that state is the number of remaining frames. }
-    \label{fig:trajectory_viz}
-\end{figure}
-
-The resulting search produces compact, provably correct solution trajectories that serve as the supervised signal for training all three heuristic approaches. This provides a rich dataset of (state, cost-to-go) pairs for training heuristics to estimate the distance to solution from any given configuration. The idea of training a heuristic on exact cost-to-go labels derived from solved trajectories is adapted from the Autodidactic Iteration procedure of DeepCubeA \cite{agostinelli2019solving} and its Sokoban extension \cite{agostinelli2021admissible}. The key distinction from those works is the direction of trajectory generation: DeepCubeA constructs training states by applying random reverse moves starting from the goal, whereas this thesis obtains trajectories by forward-solving each puzzle with pruned BFS and reading labels off the solved path. Forward-solving guarantees that every training state is reachable from a real Boxoban initial configuration along a shortest path, which matches the state distribution the heuristic will encounter at A* evaluation time. All three heuristic approaches (CNN, NEAT, CoDeepNEAT) are trained on the same (state, cost-to-go) pairs, so any performance difference reflects model capacity rather than differences in data access or quality.
+From the medium split, 14{,}000 puzzles out of the full 9 million corpus were sampled and solved with the pruned BFS described later in this chapter to form the training set, and a disjoint set of 294 puzzles from the same medium split was held out as the evaluation set. A CNN data-scaling sweep (Figure~\ref{fig:cnn_scaling_solve}) shows that solve rate plateaus once the training set reaches a few thousand levels, so 14{,}000 was chosen as a point well past the plateau while remaining tractable to solve with BFS within available compute.
 
 \section{Heuristic Approaches}
 
@@ -35,7 +10,7 @@ Four heuristics are compared in this thesis: a non-learned Manhattan-distance he
 
 $$f(s_t) = g(s_t) + \hat{h}(s_t)$$
 
-where $g(s_t)$ is the cost incurred from the start. This preserves optimality when the heuristic is admissible and isolates differences in solve rate and expansion count to heuristic quality rather than search-time inflation. The four approaches differ in how $\hat{h}$ is parameterized and optimized.
+where $g(s_t)$ is the cost incurred from the start. This preserves optimality when the heuristic is admissible and isolates differences in solve rate and expansion count to heuristic quality rather than search-time inflation. The four approaches differ in how $\hat{h}$ is parameterized and optimized. All three learned heuristics are trained against the same supervised cost-to-go labels, the construction of which is described in the following section.
 
 \subsection{Manhattan Distance (Minimum Baseline)}
 
@@ -43,11 +18,11 @@ The Manhattan-distance heuristic is the classical non-learned cost-to-go estimat
 
 $$\hat{h}_{\text{Manhattan}}(s_t) = \sum_{b \in \text{boxes}(s_t)} \min_{g \in \text{goals}} \big( |r_b - r_g| + |c_b - c_g| \big)$$
 
-Boxes already on a goal contribute zero. The heuristic is admissible under unit-cost pushes because pushing a box from $(r_1,c_1)$ to $(r_2,c_2)$ requires at least $|r_1-r_2|+|c_1-c_2|$ push moves regardless of walls, deadlocks, or interactions between boxes. It carries no learned parameters, no domain-specific deadlock knowledge, and no knowledge of the player's position; it serves as the \emph{minimum} baseline that any learned heuristic must beat in order to justify the cost of training.
+Boxes already on a goal contribute zero. The heuristic is admissible under unit-cost pushes because pushing a box from $(r_1,c_1)$ to $(r_2,c_2)$ requires at least $|r_1-r_2|+|c_1-c_2|$ push moves, regardless of walls, deadlocks, or interactions between boxes. It carries no learned parameters, no domain-specific deadlock knowledge, and no knowledge of the player's position; it serves as the \emph{minimum} baseline that any learned heuristic must beat in order to justify the cost of training.
 
 \subsection{CNN Baseline (Upper-Limit Baseline)}
 
-The CNN baseline is a fixed-topology convolutional network trained by gradient descent (AdamW with cosine learning rate schedule and asymmetric Huber loss that penalizes overestimation more heavily to bias the heuristic toward admissibility) \cite{loshchilov2017decoupled}. Following the cost-to-go formulation of DeepCubeA \cite{agostinelli2019solving,agostinelli2021admissible}, this network represents the upper-limit reference: a fully gradient-trained, parameter-rich architecture against which the parameter-efficient neuroevolved heuristics are compared. The input is reshaped to $(10 \times 10 \times 5)$ and processed by four convolutional layers followed by three dense layers:
+The CNN baseline is a fixed-topology convolutional network trained by gradient descent (AdamW with cosine learning-rate schedule \cite{loshchilov2017decoupled} and an asymmetric Huber loss that penalizes overestimation more heavily to bias the heuristic toward admissibility). Following the cost-to-go formulation of DeepCubeA \cite{agostinelli2019solving, agostinelli2021admissible}, this network serves as the upper-limit reference against which the parameter-efficient neuroevolved heuristics are compared. The input is reshaped to $(10 \times 10 \times 5)$ and processed by four convolutional layers followed by three dense layers:
 
 \begin{table}[htbp]
 \centering
@@ -74,21 +49,21 @@ The dominant cost is the first dense layer following the convolutional stack, wh
 
 \subsection{NEAT}
 
-The NEAT heuristic evolves both the weights and topology of a feed-forward network from scratch. The genome is initialized with 500 input nodes, 1 output node, zero hidden nodes, and a 5\% sparse partial direct connection from inputs to the output which is approximately 25 connections at initialization. Each genome is evaluated against the full training set every generation, computing fitness as the negative MAE over all $N$ training states:
+The NEAT heuristic evolves both the weights and topology of a feed-forward network from scratch. The genome is initialized with 500 input nodes, 1 output node, zero hidden nodes, and a 5\% sparse partial direct connection from inputs to the output, which is approximately 25 connections at initialization. Each genome is evaluated against the full training set every generation, computing fitness as the negative mean absolute error between the predicted cost-to-go $\hat{c}_i$ and the ground-truth label $c_i$ over all $N$ training states:
 
 $$\text{fitness} = -\frac{1}{N}\sum_{i=1}^{N} |\hat{c}_i - c_i|$$
 
 This matches the data exposure of the CNN baseline, which also processes the entire training set each epoch, ensuring that any accuracy difference between the two approaches reflects model capacity rather than data access. Structural mutations (add-node, add-connection) grow the network only where doing so improves fitness, and speciation protects innovations from being discarded before their weights can be refined.
 
-The initial genome has approximately \textbf{26 parameters} (25 connection weights and 1 output bias). The winner genome after evolution is expected to remain in the range of tens to a few hundred parameters which is several orders of magnitude smaller than the CNN baseline.
+The initial genome has approximately \textbf{26 parameters} (25 connection weights and 1 output bias). The winner genome after evolution is expected to remain in the range of tens to a few hundred parameters, which is several orders of magnitude smaller than the CNN baseline.
 
 \subsection{CoDeepNEAT}
 
 CoDeepNEAT coevolves two NEAT populations: \textit{modules} (individual dense-dropout blocks) and \textit{blueprints} (topology graphs whose nodes point to module species). During each generation, 10 blueprints are assembled with 3 genomes per blueprint against a module population of 50, yielding 30 complete Keras models per generation. Each assembled genome is trained with Adam on an 8{,}192-state subsample of the training set for 5 gradient-descent epochs (batch size 512) using MAE as the loss, then scored on a held-out validation split. Fitness is assigned as $1/(1 + \text{val\_MAE})$ and attributed back to both the blueprint and all modules that participated in the assembled genome, so that structural components which consistently contribute to low-MAE assemblies accumulate reproductive advantage across generations. Evolution runs for 50 generations.
 
-This interleaving means the gradient-descent stage does not train any single network to convergence; instead, 5 epochs on a resampled subset provides a noisy but inexpensive estimate of how well a given topology can fit the data, and the evolutionary loop uses that estimate to select topologies that are both trainable and accurate. The subsample refreshes each genome evaluation, which prevents any one architecture from overfitting to a fixed slice and keeps the fitness signal comparable across the population. Across the 50-generation run the model with the lowest validation MAE is checkpointed with its trained weights and used directly at A* evaluation time; no separate full-dataset retraining stage is applied.
+This interleaving means the gradient-descent stage does not train any single network to convergence; instead, 5 epochs on a resampled subset provide a noisy but inexpensive estimate of how well a given topology can fit the data, and the evolutionary loop uses that estimate to select topologies that are both trainable and accurate. The subsample refreshes on each genome evaluation, which prevents any one architecture from overfitting to a fixed slice and keeps the fitness signal comparable across the population. Across the 50-generation run, the model with the lowest validation MAE is checkpointed with its trained weights and used directly at A* evaluation time; no separate full-dataset retraining stage is applied.
 
-The module search space constrains each Dense layer to between 64 and 512 units (step 64), with an optional dropout layer (rate 0--0.3). Blueprint mutation can add or remove nodes, so the depth of the assembled network grows through evolution. Representative parameter counts for plausible evolved topologies are:
+The module search space constrains each Dense layer to between 64 and 512 units (step 64), with an optional dropout layer (rate 0--0.3). Blueprint mutation can add or remove nodes, so the depth of the assembled network grows through evolution. Although CoDeepNEAT in principle supports convolutional, fully connected, and recurrent layer types per node \cite{miikkulainen2019evolving}, the module space in this thesis is restricted to dense-dropout blocks so that the evolved architecture differs from the NEAT genome only in its weight optimizer (Adam gradient descent versus Gaussian weight perturbation), isolating the contribution of gradient information to the comparison. The CNN baseline's 100\% solve rate motivates extending the module space to convolutional blocks in future work, as discussed in the conclusion. Representative parameter counts for plausible evolved topologies are:
 
 \begin{center}
 \begin{tabular}{lr}
@@ -107,10 +82,35 @@ $500 \to 256 \to 128 \to 64 \to 1$ & $169{,}473$ \\
 
 The table above lists illustrative architectures within the per-layer search space rather than upper bounds on the full assembled network: because blueprint mutation can stack multiple modules and unit counts up to 512 are permitted, deeper or wider assemblies are reachable during evolution. The actual evolved winner is a $500 \to 320 \to 320 \to 1$ network with 263{,}361 trainable parameters, roughly $7.7\times$ smaller than the CNN baseline.
 
+\section{Forward BFS Trajectories and Cost-to-Go Labels}
+
+Training labels for the three learned heuristics are derived directly from forward breadth-first search (BFS) solutions. For each Boxoban puzzle, BFS expands states outward from the initial configuration until it reaches a goal state, producing a shortest-path trajectory $s_0, s_1, \dots, s_T$ where $s_0$ is the given initial state and $s_T$ is the first goal state encountered. During the labeling pass, each state $s_i$ on this trajectory is assigned a cost-to-go label $c_i = T - i$, where $i$ is the step index along the trajectory.
+
+A standard BFS applied to the full Sokoban state space is computationally intractable because many branches lead to deadlock configurations that can never reach a solution, causing the search frontier to grow unnecessarily large. To make forward BFS feasible, three pruning mechanisms are applied during expansion, each one cheap enough to evaluate inline on every successor:
+
+\begin{itemize}
+    \item \textbf{Dead-square precomputation.} Before search begins, a backward reachability pass is run from every goal cell: a square is marked \textit{live} if there exists some box position and matching player position from which a box could be pushed onto it and then on to a goal, and every remaining non-wall square is marked \textit{dead}. Any successor state that places a box on a dead square is immediately pruned, because no sequence of legal pushes from that configuration can deliver that box to a goal. This is strictly stronger than corner-only detection, since it also catches wall-hugging squares with no goal along the wall segment.
+    \item \textbf{Frozen 2$\times$2 deadlock detection.} After every box-pushing move, the successor state is scanned for any $2\times 2$ block in which all four cells are either walls or boxes. If such a block contains at least one box not on a goal, the configuration is a permanent deadlock (none of those boxes can ever move again) and the branch is pruned. This check is only invoked when the most recent action actually pushed a box, so it adds no cost to pure player-movement transitions.
+    \item \textbf{Reverse-move pruning.} If the last action was a player move that did \textit{not} push a box, the immediately opposite action is forbidden from the successor set. This removes the trivial back-and-forth symmetry in which the agent walks one step and undoes it, without affecting solution completeness (any state reachable via a reverse move is also reachable by the preceding state with that move omitted).
+\end{itemize}
+
+In addition to these pruning rules, BFS deduplicates by a state hash over the player position and box positions, so identical configurations reached by different action sequences are expanded at most once. Together these mechanisms keep the frontier small enough that medium-split puzzles solve within a half-million-node budget.
+
+Because BFS returns a shortest path under uniform step cost, these labels are the exact ground-truth cost-to-go for every state on the trajectory: the goal state $s_T$ receives label 0, and the initial state receives label $T$.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{trajectory/level0_trajectory.png}
+    \caption{Visualization of a BFS solution trajectory for a single Boxoban level. The blue square is the player, and the brown boxes are the boxes that need to be pushed onto red goal positions. Green squares are boxes already on goal positions. Each frame shows a state along the path from initial configuration to goal; the cost-to-go label assigned to that state is the number of remaining frames.}
+    \label{fig:trajectory_viz}
+\end{figure}
+
+The resulting search produces compact, provably correct solution trajectories that serve as the supervised signal for training the CNN, NEAT, and CoDeepNEAT heuristics. The idea of training a heuristic on exact cost-to-go labels derived from solved trajectories is adapted from the Autodidactic Iteration procedure of DeepCubeA \cite{agostinelli2019solving} and its Sokoban extension \cite{agostinelli2021admissible}. The key distinction from those works is the direction of trajectory generation: DeepCubeA constructs training states by applying random reverse moves starting from the goal, whereas this thesis obtains trajectories by forward-solving each puzzle with pruned BFS and reading labels off the solved path. Forward-solving guarantees that every training state is reachable from a real Boxoban initial configuration along a shortest path, which matches the state distribution the heuristic will encounter at A* evaluation time. All three learned heuristics are trained on the same (state, cost-to-go) pairs, so any performance difference reflects model capacity rather than differences in data access or quality.
+
 \section{Training Metrics}
 
-The CNN was trained with a loss function for minimizing the Huber loss \cite{huber1992robust} on batches of (state, cost-to-go) pairs, with overestimation penalized at $2\times$ to bias toward admissibility. 
+The CNN was trained by minimizing the Huber loss \cite{huber1992robust} on batches of (state, cost-to-go) pairs, with overestimation penalized at $2\times$ to bias toward admissibility.
 
-NEAT and CoDeepNEAT uses a fitness function to train the network either fully or partially. The fitness function of NEAT was $= -\text{MAE}$ and the best genome by validation MAE is checkpointed. 
+NEAT and CoDeepNEAT use a fitness function to train the network either fully or partially. The fitness function of NEAT is $-\text{MAE}$, and the best genome by validation MAE is checkpointed.
 
-CoDeepNEAT uses $MAE$ as the loss function for the gradient descent and uses $1/(1 + {val\_MAE})$ as the fitness function for evolving the network architecture with NEAT.
+CoDeepNEAT uses $\text{MAE}$ as the loss function for gradient descent and $1/(1 + \text{val\_MAE})$ as the fitness function for evolving the network architecture with NEAT.

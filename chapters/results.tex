@@ -30,10 +30,15 @@ DeepCube CNN cost-to-go (upper-limit baseline) & 2{,}031{,}809 & 100.0\% (294/29
 
 The Manhattan-distance heuristic solves 87.4\% of the held-out levels (257/294) under
 the same 100{,}000 expansion budget as every other method, despite having zero
-trainable parameters and no knowledge of walls, deadlocks, or player position
-(Figure~\ref{fig:manhattan_search}). Because the heuristic is provably admissible
-under unit-cost pushes, every recovered solution is also optimal-length: the
-average solution-length to optimal-length ratio is 1.00 across all solved levels.
+trainable parameters and computing only the per-box L1 distance to the nearest goal
+cell (Figure~\ref{fig:manhattan_search}). The A* search itself applies dead-square
+precomputation, frozen $2\times2$ deadlock detection, reverse-move suppression, and
+state-hash deduplication identically to every heuristic in this thesis, so the
+87.4\% figure isolates the contribution of the heuristic signal under search-side
+pruning that is held fixed across all four methods. Because the heuristic is
+provably admissible under unit-cost pushes, every recovered solution is also
+optimal-length: the average solution-length to optimal-length ratio is 1.00 across
+all solved levels.
 
 \begin{figure}[H]
     \centering
@@ -42,32 +47,38 @@ average solution-length to optimal-length ratio is 1.00 across all solved levels
     \label{fig:manhattan_search}
 \end{figure}
 
-That a parameter-free heuristic clears 87\% of the medium split establishes the
-floor any learned heuristic must beat. Reframing the comparison around this floor
-yields the central result of the thesis: pure NEAT, despite searching over both
-topology and weights, fails to clear it, while CoDeepNEAT, which adds gradient-based
-weight optimization to the evolutionary search, beats it.
+A parameter-free heuristic clearing 87\% of the medium split establishes the floor
+that any learned heuristic must beat to justify its training cost. Framing the
+comparison around this floor yields the central result of the thesis: pure NEAT,
+despite searching over both topology and weights, fails to clear it, while
+CoDeepNEAT, which adds gradient-based weight optimization to the evolutionary
+search, beats it.
 
 \subsection{CNN Baseline (Upper-Limit Baseline)}
 
-The CNN baseline is trained on 14{,}000 BFS-solved puzzles drawn from the Boxoban
+The CNN baseline is trained on the same 14{,}000 BFS-solved puzzles drawn from the Boxoban
 medium split and evaluated on a disjoint set of 294 puzzles from the same split. With
 this training set, the CNN achieves a 100\% solve rate (294/294) under the 100{,}000
 node expansion budget, which serves as the upper-limit reference for the
-neuroevolved heuristics. The 97.3\% figure that appears in the data-scaling analysis is
-not a separate baseline but a single point from an earlier ablation that varied the
-training set size: at the 14{,}000-level training point in that ablation the CNN solved
-286/294, while subsequent runs with refined training (matching the configuration used
-elsewhere in this thesis) reach 100\%. Both numbers are measured at the same 100{,}000
-expansion budget on the same held-out 294 puzzles.
+neuroevolved heuristics. The data-scaling analysis (Figure~\ref{fig:cnn_scaling_solve})
+is not a separate baseline but an earlier ablation that swept the training set size
+under a less refined training configuration; its 14{,}000-trajectory point reached
+98.6\% (290/294) rather than 100\%. Subsequent runs with the refined training configuration
+used elsewhere in this thesis reach the 100\% reported above. Both numbers are measured
+at the same 100{,}000 expansion budget on the same held-out 294 puzzles, so the gap
+between them reflects training-side hyperparameter choices, not data quantity or evaluation protocol.
 
 The data-scaling curve (Figure~\ref{fig:cnn_scaling_solve}) shows that solve rate
-rises steeply with training set size and then plateaus: 69.7\% at 100 levels,
-94.9\% at 1{,}000 levels, 97.6\% at 5{,}000 levels, and saturates beyond
-that. This plateau is the empirical justification for using a 14{,}000-level training
-set rather than the full nine-million-level Boxoban corpus: the heuristic is not
-data-limited beyond a few thousand training examples, and additional levels yield
-diminishing returns at substantial BFS-solving cost.
+rises steeply with training set size and then converges: 69.7\% at 100 trajectories,
+94.6\% at 1{,}000 trajectories, 97.3\% at 5{,}000 trajectories, and 98.6\% at
+14{,}000 trajectories under the ablation's training configuration. The marginal gain
+from each tenfold increase in training data shrinks rapidly, and the later ablation
+that retrained at 14{,}000 trajectories with refined hyperparameters reached the
+100\% reported above, cementing 14{,}000 as the effective benchmark training set.
+Together these results justify using 14{,}000 trajectories rather than the full
+nine-million-level Boxoban corpus: the heuristic is not data-limited beyond a few
+thousand training examples, and additional trajectories yield diminishing returns
+at substantial BFS-solving cost.
 
 \begin{figure}[htbp]
     \centering
@@ -77,12 +88,14 @@ diminishing returns at substantial BFS-solving cost.
 \end{figure}
 
 The 100{,}000 expansion budget is imposed deliberately so that the CNN, NEAT, and
-CoDeepNEAT heuristics are
-compared under identical search-time budgets. A less accurate heuristic will explore
-more nodes per level to reach a solution, and without a fixed cap the comparison
-would conflate heuristic quality with total search cost. The 100{,}000 budget was
-chosen as a baseline to provide enough search-time budget for the baseline CNN heuristics; only 2.7\% of the puzzles were left unsolved within the budget. Under the same budget, other neuroevolution-based heuristics are meaningfully constrained. Reporting all three methods under the same cap therefore
-isolates how heuristic accuracy translates into search efficiency.
+CoDeepNEAT heuristics are compared under identical search-time budgets. A less
+accurate heuristic will explore more nodes per level to reach a solution, and
+without a fixed cap the comparison would conflate heuristic quality with total
+search cost. The cap was chosen so that the CNN baseline could solve essentially
+every level (it reaches 100\% at this budget), while still meaningfully
+constraining the neuroevolved heuristics. Reporting all three methods under the
+same cap therefore isolates how heuristic accuracy translates into search
+efficiency.
 
 \subsection{NEAT Discussion}
 
@@ -94,12 +107,12 @@ The NEAT heuristic solves 84.0\% of the 294 held-out levels (247/294, Figure~\re
     \caption{NEAT baseline (\texttt{conn\_del}=0.5) A* search results on the 294 held-out medium-split levels under the 100{,}000 expansion budget. Solve rate: 84.0\% (247/294).}
     \label{fig:neat_baseline_search}
 \end{figure} The winner genome contains 4 internal
-nodes and 21 enabled connections for a total of 25 trainable parameters. This is approximately 0.001\% of the 2{,}031{,}809-parameter CNN baseline. Figure~\ref{fig:neat_winner_topology} visualises the genome by mapping every enabled input-to-network connection back to its position in the $5 \times 10 \times 10$ input tensor: 12 of the 21 enabled connections feed directly into the output node, while the remaining 9 are split evenly across three hidden nodes (two input edges plus one hidden-to-output edge each). The connectivity is heavily biased toward the BOX channel, with secondary contributions from WALL, GOAL, and PLAYER, and only sparse use of the BG channel.
+nodes and 21 enabled connections for a total of 25 trainable parameters. This is approximately 0.001\% of the 2{,}031{,}809-parameter CNN baseline. Figure~\ref{fig:neat_winner_topology} visualizes the genome by mapping every enabled input-to-network connection back to its position in the $5 \times 10 \times 10$ input tensor: 12 of the 21 enabled connections feed directly into the output node, while the remaining 9 are split evenly across three hidden nodes (two input edges plus one hidden-to-output edge each). The connectivity is heavily biased toward the BOX channel, with secondary contributions from WALL, GOAL, and PLAYER, and only sparse use of the BG channel.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep/winner_topology}
-    \caption{NEAT winner genome topology. Each scatter point on the five $10 \times 10$ channel grids marks a single enabled connection from an input cell into the network; marker shape indicates the target node ($\bigcirc$ output, $\square / \diamond / \triangle$ hidden nodes H1/H2/H3) and color encodes connection weight (red positive, blue negative). The lower panel shows the four-node internal topology with each hidden node's three-input fan-in summarised and the three hidden-to-output weights shown explicitly.}
+    \caption{NEAT winner genome topology. Each scatter point on the five $10 \times 10$ channel grids marks a single enabled connection from an input cell into the network; marker shape indicates the target node ($\bigcirc$ output, $\square / \diamond / \triangle$ hidden nodes H1/H2/H3) and color encodes connection weight (red positive, blue negative). The lower panel shows the four-node internal topology with each hidden node's three-input fan-in summarized and the three hidden-to-output weights shown explicitly.}
     \label{fig:neat_winner_topology}
 \end{figure}
 
@@ -125,18 +138,23 @@ cost-to-go, contribute disproportionately to absolute error: a single 70-step pu
 mispredicted by 20 hurts the fitness more than ten 25-step puzzles each
 mispredicted by 2. The survival pressure on the genome is therefore biased toward
 fitting the heaviest-cost puzzles in the training set, and the cheapest way to
-fit them with a 25-parameter network is to memorise spatial cues from box
+fit them with a 25-parameter network is to memorize spatial cues from box
 positions that co-occur with long solutions. The resulting heuristic is not a
-generalisable cost-to-go estimator; it is a small position-keyed regression onto
+generalizable cost-to-go estimator; it is a small position-keyed regression onto
 the high-cost tail of the training distribution. On unseen puzzles where the box
-positions do not match those memorised patterns, the heuristic provides no
+positions do not match those memorized patterns, the heuristic provides no
 information beyond what the BOX-only inputs accidentally imply, and A* search
 falls back to expanding broadly. This explains both why solve rate falls below
 Manhattan (the analytical heuristic uses the GOAL channel that NEAT effectively
-ignored) and why the failures are concentrated on puzzles whose box-and-goal
-geometry the genome has no way to read jointly.
+ignored) and why solve rates are nearly uniform across the NEAT hyperparameter
+sweep: when the heuristic carries little information beyond a position-keyed
+prior, the search is led primarily by the shared search-side pruning machinery
+(dead-square precomputation, frozen $2\times2$ deadlock detection, reverse-move
+suppression, and state-hash deduplication) rather than by the heuristic itself,
+so swapping NEAT hyperparameters moves solve rate by only a fraction of a
+percentage point.
 
-The deeper cause is granularity of the optimiser, not size of the genome. NEAT
+The deeper cause is granularity of the optimizer. NEAT
 adjusts weights only through Gaussian perturbation under the
 \texttt{weight\_mutate\_power} schedule, and the hyperparameter sweep in
 Appendix~\ref{app:neat_sweeps} confirms that varying this perturbation magnitude
@@ -153,41 +171,18 @@ this input dimensionality.
 The CoDeepNEAT result is the empirical confirmation of this diagnosis. CoDeepNEAT
 keeps NEAT's evolutionary architecture search but replaces weight perturbation with
 Adam gradient descent on each assembled genome, and that single substitution moves
-solve rate from 83.9\% (below Manhattan) to 88.8\% (above Manhattan). The
-architecture search itself does not change; what changes is that weights are now
-optimised by a method that uses the actual gradient of the MAE loss instead of
-isotropic Gaussian noise. The 4.9 percentage-point jump from pure NEAT to
+solve rate from 83.9\% (below Manhattan) to 88.8\% (above Manhattan). The substitution replaces isotropic Gaussian weight perturbation with Adam steps
+driven by the actual MAE gradient, which is a coordinate-aligned signal rather
+than a random one. The 4.9 percentage-point jump from pure NEAT to
 CoDeepNEAT, and the simultaneous crossing of the Manhattan baseline, is therefore
-attributable to gradient information rather than topology innovation, which is
-exactly what the topology figure suggests should be limiting pure NEAT in the first
-place.
+attributable to gradient information rather than topology innovation. This is
+consistent with the topology analysis in Figure~\ref{fig:neat_winner_topology},
+which identifies weight-perturbation granularity, rather than topological
+expressiveness, as the binding constraint on pure NEAT.
 
 \subsection{CoDeepNEAT Discussion}
-CoDeepNEAT produced a higher solve rate of 88.8\% (261/294) compared to the 84.0\% of pure NEAT, and crucially also clears the 87.4\% Manhattan-distance baseline by 1.4 percentage points. CoDeepNEAT is therefore the only neuroevolved method in this thesis that beats the parameter-free analytical baseline; the gradient-descent phase that distinguishes it from pure NEAT is what closes the gap. The evolved best architecture is a $500 \to 320 \to 320 \to 1$ feed-forward network containing 263{,}361 trainable parameters which is about $7.7\times$ smaller than the CNN baseline but roughly $10{,}500\times$ larger than the NEAT genome. The improvement over pure NEAT is likely driven by the finetuned weights produced by the Adam optimizer during each genome's gradient-descent phase, which captures finer gradient information about the cost-to-go space than NEAT's pure weight perturbation can. However, this comes at the cost of three orders of magnitude more parameters in exchange for only a 4.8 percentage-point increase in solve rate over NEAT and a 1.4 percentage-point increase over the parameter-free Manhattan baseline.
+CoDeepNEAT produces a higher solve rate of 88.8\% (261/294) than pure NEAT's 84.0\%, and crucially also clears the Manhattan-distance baseline by 1.4 percentage points. CoDeepNEAT is therefore the only neuroevolved method in this thesis that beats the parameter-free analytical baseline; the gradient-descent phase that distinguishes it from pure NEAT is what closes the gap. The evolved best architecture is a $500 \to 320 \to 320 \to 1$ feed-forward network containing 263{,}361 trainable parameters, about $7.7\times$ smaller than the CNN baseline but roughly $10{,}500\times$ larger than the NEAT genome. The improvement over pure NEAT is likely driven by the fine-tuned weights produced by the Adam optimizer during each genome's gradient-descent phase, which captures finer gradient information about the cost-to-go space than NEAT's pure weight perturbation can. However, this comes at the cost of three orders of magnitude more parameters in exchange for only a 4.8 percentage-point increase in solve rate over NEAT and a 1.4 percentage-point increase over the parameter-free Manhattan baseline.
 
 \subsection{Interpretation of Findings}
 
-The four-way comparison places the two neuroevolved heuristics between a clear lower
-and upper reference. Manhattan distance, with zero parameters and no learning,
-solves 87.4\% of the held-out levels, so the bar for a learned heuristic to be worth
-training at all is roughly 87\%. The CNN cost-to-go network, with 2{,}031{,}809
-parameters and full gradient training, solves 100\% of the same levels and
-establishes the upper limit. The neuroevolved heuristics fall on opposite sides of
-the Manhattan floor: pure NEAT, at 84.0\%, fails to clear the floor despite searching
-over both topology and weights, while CoDeepNEAT, at 88.8\%, clears it.
-
-The split between NEAT and CoDeepNEAT is the central empirical finding. Pure NEAT's
-weight-perturbation search is overmatched by the dimensionality of the $500$-binary
-input grid: 25 evolved parameters cannot extract a heuristic signal more accurate
-than the per-box minimum-Manhattan-distance summation that the Manhattan baseline
-already provides analytically. CoDeepNEAT swaps weight perturbation for full Adam
-gradient descent on each assembled genome and recovers enough fine-grained gradient
-information to beat the analytical baseline at $7.7\times$ fewer parameters than the
-CNN. In other words, neuroevolution \emph{can} beat the Manhattan-distance baseline
-on Boxoban, but only when the architectural search is paired with gradient-based
-weight optimization; pure topology-and-weight evolution from scratch is not enough
-on inputs of this dimensionality. The gap between CoDeepNEAT and the CNN
-(11.2 percentage points) remains non-trivial, but the fact that a $7.7\times$
-parameter reduction loses only $\sim$11\% solve rate \emph{and} clears the Manhattan
-floor suggests that heuristic compression through neuroevolution is a direction
-warranting further study.
+The split between NEAT and CoDeepNEAT, summarized in Table~\ref{tab:results_summary}, is the central empirical finding. Pure NEAT's weight-perturbation search is overmatched by the dimensionality of the $500$-binary input grid: a 25-parameter genome cannot extract a heuristic signal more accurate than the per-box minimum-Manhattan-distance summation that the Manhattan baseline already provides analytically. CoDeepNEAT, by contrast, clears that baseline. The contrast establishes the central claim of the thesis: neuroevolution \emph{can} beat the Manhattan-distance baseline on Boxoban, but only when architectural search is paired with gradient-based weight optimization; pure topology-and-weight evolution from scratch is not enough on inputs of this dimensionality. The remaining gap to the CNN is non-trivial, but the fact that a $7.7\times$ parameter reduction still clears the Manhattan floor suggests that heuristic compression through neuroevolution is a direction warranting further study.

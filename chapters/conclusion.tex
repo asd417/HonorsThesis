@@ -1,41 +1,29 @@
-This thesis investigated whether neuroevolution can produce cost-to-go heuristic functions
+This thesis asked whether neuroevolution can produce cost-to-go heuristic functions
 for A* search on Boxoban that are substantially more parameter-efficient than a
-conventional gradient-trained CNN baseline. Four heuristics were implemented and compared
-on 294 unseen levels under an identical 100{,}000 expansion budget: a parameter-free
-Manhattan-distance heuristic that anchored the minimum baseline, a fixed convolutional
-network with 2 million parameters adapted from DeepCubeA that anchored the upper-limit
-baseline, a NEAT-evolved feed-forward network, and a CoDeepNEAT hybrid that combined
-evolutionary architecture search with gradient-descent weight training.
+conventional gradient-trained CNN baseline. The four-way comparison reported in
+Chapter~\ref{ch:results} answers in the affirmative, but only conditionally: pure
+topology-and-weight evolution from scratch is not enough on inputs of this
+dimensionality, while pairing evolutionary architecture search with gradient-based
+weight optimization recovers enough accuracy to clear the analytical baseline at a
+fraction of the gradient-trained upper bound.
 
-The Manhattan-distance heuristic, summing per-box minimum distance to a goal,
-solved 87.4\% (257/294) of the held-out levels with zero trainable parameters. This is
-the floor that any learned heuristic must beat to justify its training cost. The CNN
-baseline solved 100\% (294/294) under the same budget and serves as the upper-limit
-reference. NEAT evolved a heuristic of just 25 parameters (4 internal nodes and
-21 enabled connections, roughly 0.001\% of the CNN baseline's parameter count) and
-achieved an 84.0\% solve rate, falling 3.4 percentage points \emph{below} the
-parameter-free Manhattan baseline. This shortfall is consistent with NEAT's known
-weakness on high-dimensional inputs: weight-perturbation search across a $500$-binary
-input grid cannot recover enough gradient information to outperform a purely
-geometric estimate. CoDeepNEAT, which coevolves dense-dropout modules and blueprint
-topologies and trains each assembled genome by gradient descent, discovered a
-$500 \to 320 \to 320 \to 1$ architecture with 263{,}361 parameters (roughly
-$7.7\times$ smaller than the CNN baseline) and achieved an 88.8\% solve rate.
-CoDeepNEAT is therefore the only neuroevolved method in this thesis that
-\emph{beats} the Manhattan-distance baseline; the addition of Adam gradient descent
-on each assembled genome is what closes the gap that pure NEAT cannot.
+The split between NEAT and CoDeepNEAT is the load-bearing finding. NEAT's failure
+to clear the Manhattan floor, despite searching over both topology and weights,
+is consistent with its known weakness on high-dimensional inputs: weight
+perturbation cannot supply the gradient information required to outperform a
+purely geometric estimate on a $500$-binary input grid. CoDeepNEAT keeps the
+evolutionary architecture search but replaces NEAT's weight perturbation with
+Adam gradient descent on each assembled genome, and that one change closes the
+gap. The
+implication is that the productive locus of neuroevolution research on inputs of
+this dimensionality is the hybrid: evolution chooses the architecture, gradients
+tune the weights.
 
-These results sharpen the case for hybrid neuroevolution. Pure topology-and-weight
-evolution from scratch is not enough on inputs of this dimensionality, so it loses
-to a parameter-free analytical heuristic. Pairing evolutionary architecture search
-with gradient-based weight optimization recovers enough accuracy to clear the
-analytical baseline while still operating at a fraction of the gradient-trained
-upper bound. The gap between CoDeepNEAT and the CNN (11.2 percentage points)
-remains non-trivial, but the scale of the parameter reduction relative to the
-modest drop in solve rate, and the fact that CoDeepNEAT clears the Manhattan floor
-that pure NEAT cannot, suggests that hybrid neuroevolution is a viable strategy
-for heuristic compression when pure topology evolution is too constrained but a
-fully hand-designed CNN is too parameter-heavy.
+The remaining gap between CoDeepNEAT and the CNN is non-trivial, but the
+parameter reduction relative to the modest drop in solve rate, and the fact that
+CoDeepNEAT clears the floor that pure NEAT cannot, suggests that hybrid
+neuroevolution is a viable strategy for heuristic compression when pure topology
+evolution is too constrained and a fully hand-designed CNN is too parameter-heavy.
 
 \subsection{Future Work}
 
@@ -43,16 +31,16 @@ The empirical separation between pure NEAT and CoDeepNEAT, on opposite sides of 
 Manhattan baseline, indicates that further investigation should concentrate on the
 hybrid method rather than on additional scaling of pure topology-and-weight evolution.
 
-Based on the NEAT topology figure, one can deduce that weight perturbation can not supply the granular updates trequired by a $500$-dimensional binary input and this is unlikely solved by larger population or longer evolutionary runs alone. The more
-productive intervention is to replace the weight optimiser, as CoDeepNEAT does.
-Future work should therefore prioritise CoDeepNEAT-style hybrids in which an
+Based on the NEAT topology figure, one can deduce that weight perturbation cannot supply the granular updates required by a $500$-dimensional binary input, and this is unlikely to be solved by a larger population or longer evolutionary runs alone. The more
+productive intervention is to replace the weight optimizer, as CoDeepNEAT does.
+Future work should therefore prioritize CoDeepNEAT-style hybrids in which an
 evolutionary outer loop searches over architecture while a gradient-based inner loop
 performs weight tuning, allowing architecture search to proceed without being confounded
 by stochastic weight perturbation.
 
 Two extensions follow directly. First, the gradient-descent inner loop in CoDeepNEAT
 trains each assembled genome on a fixed subsample for a fixed number of epochs.
-Systematic ablation of this inner loop, varying the subsample size, optimiser, loss
+Systematic ablation of this inner loop, varying the subsample size, optimizer, loss
 function, number of epochs, and fitness-aggregation rule across blueprint assemblies,
 would clarify which components of the gradient signal are responsible for the
 performance gain over pure NEAT. The same outer-evolution, inner-gradient pattern can
@@ -63,15 +51,15 @@ baseline, independent of the module/blueprint coevolution machinery.
 
 Second, the upper-limit baseline in this thesis is a convolutional network, and its
 100\% solve rate constitutes the strongest evidence presented here that convolutional
-inductive bias underlies the recovery of a generalised cost-to-go estimator on
+inductive bias underlies the recovery of a generalized cost-to-go estimator on
 Boxoban's $10 \times 10$ grid. The dense-dropout module space searched by CoDeepNEAT
 does not provide this prior, which offers a plausible account of why CoDeepNEAT
-plateaued at 88.8\%. Extending CoDeepNEAT's module space to include convolutional
-blocks parameterised by filter count, kernel size, stride, and optional pooling, and
+plateaued. Extending CoDeepNEAT's module space to include convolutional
+blocks parameterized by filter count, kernel size, stride, and optional pooling, and
 correspondingly extending NEAT's primitives to admit shared-weight convolutional
 connections in place of purely dense ones, would bring together the three ingredients
 that distinguish the upper-limit baseline from the neuroevolved methods: spatial
-inductive bias, gradient-based weight optimisation, and parameter-efficient architecture
-search. Closing the remaining 11.2-point gap to the CNN while preserving the parameter
+inductive bias, gradient-based weight optimization, and parameter-efficient architecture
+search. Closing the remaining gap to the CNN while preserving the parameter
 advantage already demonstrated by CoDeepNEAT is the most plausible role for this
 convolutional-hybrid direction in subsequent work.
