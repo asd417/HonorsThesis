@@ -4,7 +4,7 @@ NeuroEvolution of Augmenting Topologies (NEAT), introduced by Stanley and Miikku
 
 \subsection{Encoding and Historical Markings}
 
-NEAT represents each network as a genome consisting of two gene lists: node genes and connection genes. A connection gene encodes a directed edge between two nodes, carrying a weight, an enable flag, and an \textit{innovation number} --- a global counter incremented each time a new structural mutation occurs anywhere in the population. Innovation numbers serve as historical markings that identify which structural mutations arose at the same point in evolutionary history, making it possible to align genomes of different topologies for crossover without requiring computationally expensive topological matching.
+NEAT represents each network as a genome consisting of two gene lists: node genes and connection genes. A connection gene encodes a directed edge between two nodes, carrying a weight, an enable flag, and an \textit{innovation number}, a global counter incremented each time a new structural mutation occurs anywhere in the population. Innovation numbers serve as historical markings that identify which structural mutations arose at the same point in evolutionary history, making it possible to align genomes of different topologies for crossover without requiring computationally expensive topological matching.
 
 When two genomes mate, connection genes are aligned by their innovation numbers. Genes present in both parents (matching genes) are inherited randomly from either parent. Genes present in only one parent (disjoint or excess genes) are inherited from the more fit parent. This alignment procedure allows crossover between structurally different networks while preserving functional substructures.
 
@@ -14,7 +14,7 @@ NEAT introduces two structural mutations in addition to the standard weight pert
 
 \begin{itemize}
     \item \textit{Add connection}: a new connection is inserted between two previously unconnected nodes, with a randomly initialized weight and a new innovation number.
-    \item \textit{Add node}: an existing connection is split by inserting a new node. The original connection is disabled, and two new connections are added --- one from the source node to the new node with weight 1, and one from the new node to the target with the original weight. This initialization preserves the network's existing behavior while providing a scaffold for further adaptation.
+    \item \textit{Add node}: an existing connection is split by inserting a new node. The original connection is disabled, and two new connections are added; one from the source node to the new node with weight 1, and one from the new node to the target with the original weight. This initialization preserves the network's existing behavior while providing a scaffold for further adaptation.
 \end{itemize}
 
 Because new structural mutations initially degrade fitness before they can be refined by evolution, NEAT protects innovation through \textit{speciation}: genomes are grouped into species based on a compatibility distance measure computed from the number of disjoint and excess genes and the average weight difference of matching genes. Fitness sharing within species ensures that novel structures are evaluated relative to topologically similar individuals rather than competing immediately against well-tuned incumbents.
