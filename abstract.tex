@@ -11,14 +11,16 @@ search. The standard approach fixes a neural network architecture and trains it 
 descent; this thesis investigates whether evolutionary search over network topology can find heuristics
 that are competitive in accuracy while using orders of magnitude fewer parameters.
 
-Three heuristic approaches are implemented and compared on the medium-difficulty
+Four heuristic approaches are implemented and compared on the medium-difficulty
 split of the Boxoban benchmark, a dataset of procedurally generated $10\times10$
 Sokoban levels released by Google. From the medium split, 14{,}000 puzzles are used
 for training and a disjoint 294 puzzles for held-out evaluation; the training set
 size was chosen at the empirical plateau of the CNN's data-scaling curve.
-The CNN baseline is a fixed convolutional architecture with 2 million parameters
-trained by AdamW on cost-to-go labels derived from Breadth-First Search solution
-trajectories. NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology
+A parameter-free Manhattan-distance heuristic, summing per-box minimum distance to
+a goal, anchors the minimum baseline. The CNN cost-to-go network, adapted from
+DeepCubeA with 2 million parameters trained by AdamW on cost-to-go labels derived
+from Breadth-First Search solution trajectories, anchors the upper-limit baseline.
+NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology
 and weights of a feed-forward heuristic from scratch using the same labels, starting
 from approximately 26 parameters and growing complexity only where it improves
 prediction accuracy; the evolved winner contained 25 trainable parameters (4 internal
@@ -27,9 +29,14 @@ and blueprint topologies, combining evolutionary architecture search with per-ge
 gradient-descent weight training, producing an assembled $500 \to 320 \to 320 \to 1$
 network with 263{,}361 parameters.
 
-Under A* search with a 100{,}000-node expansion budget, the CNN baseline solves
-100\% (294/294) of the held-out levels, NEAT solves 84.0\% (247/294) using roughly
-0.001\% of the CNN's parameter count, and CoDeepNEAT solves 88.8\% (261/294) using
-roughly $7.7\times$ fewer parameters than the CNN. The results show that
-neuroevolution can close the accuracy gap relative to the gradient-trained
-baseline while maintaining a substantial advantage in parameter count.
+Under A* search with a 100{,}000-node expansion budget, the Manhattan-distance
+baseline solves 87.4\% (257/294) of held-out levels with zero parameters, the CNN
+upper-limit baseline solves 100\% (294/294), NEAT solves 84.0\% (247/294)---falling
+\emph{below} the Manhattan baseline despite searching over both topology and
+weights---and CoDeepNEAT solves 88.8\% (261/294) using roughly $7.7\times$ fewer
+parameters than the CNN. CoDeepNEAT is therefore the only neuroevolved method in
+this thesis that clears the Manhattan minimum baseline; the addition of Adam
+gradient descent on each assembled genome is what closes the gap that pure NEAT
+cannot. The results show that neuroevolution \emph{can} beat a parameter-free
+analytical baseline on Boxoban, but only when evolutionary architecture search is
+paired with gradient-based weight optimization on inputs of this dimensionality.

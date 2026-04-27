@@ -66,24 +66,37 @@ across the full distribution of puzzle configurations.
 
 \section{Contributions}
 
-This thesis makes three primary contributions. First, we implement a CNN baseline
-heuristic with four layers of convolution with 2 million trainable parameters. The loss function was modified to punish overestimation of value more than underestimation to encourage training an admissible heuristic. The function is then evaluated in a subset of unseen Boxoban levels for solution ratio.
+This thesis makes four primary contributions, organized as a pair of reference
+baselines bracketing two neuroevolved heuristics.
 
-Second, we apply NEAT \cite{stanley2002evolving} to evolve a feed-forward heuristic
-network from a minimal starting topology. NEAT searches simultaneously over network topology and weights, 
+First, we establish a parameter-free Manhattan-distance heuristic, summing each
+box's minimum Manhattan distance to a goal cell, as the \emph{minimum} baseline.
+Because the heuristic is provably admissible under unit-cost pushes, it is the
+classical analytical reference any learned heuristic must beat to justify the cost
+of training.
+
+Second, we implement a CNN baseline heuristic with four layers of convolution and
+2 million trainable parameters, adapted from the DeepCubeA cost-to-go formulation,
+as the \emph{upper-limit} baseline. The loss function was modified to punish
+overestimation of value more than underestimation to encourage training an
+admissible heuristic.
+
+Third, we apply NEAT \cite{stanley2002evolving} to evolve a feed-forward heuristic
+network from a minimal starting topology. NEAT searches simultaneously over network topology and weights,
 adding nodes and connections only where doing so improves the fitness signal, and uses speciation to protect structural innovations
 from premature elimination.
 
-Third, we apply CoDeepNEAT \cite{miikkulainen2019evolving} to coevolve populations of
+Fourth, we apply CoDeepNEAT \cite{miikkulainen2019evolving} to coevolve populations of
 dense-dropout modules and blueprint topologies, with each assembled genome trained by
 gradient descent for a fixed number of epochs per generation. This hybrid approach
 combines the architectural flexibility of evolutionary search with the weight-optimization
-efficiency of gradient descent, producing heuristics that are more lightweight than the CNN 
+efficiency of gradient descent, producing heuristics that are more lightweight than the CNN
 baseline while maintaining competitive accuracy.
 
-All three heuristics are trained on cost-to-go labels derived from Breadth-First Search
+All learned heuristics are trained on cost-to-go labels derived from Breadth-First Search
 solution trajectories over the Boxoban dataset and evaluated on unseen levels by mean
-absolute error and A* solve rate.
+absolute error and A* solve rate, with the Manhattan and CNN baselines providing the
+lower and upper reference points for the neuroevolved methods.
 
 \begin{figure}[htbp]
     \centering

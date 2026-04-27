@@ -1,3 +1,31 @@
+%% ─── Manhattan Baseline ─────────────────────────────────────────────────────
+
+\section{Manhattan Distance Baseline Results}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{manhattan/best_search_results}
+    \caption{Manhattan-distance heuristic A* search results on the 294 held-out medium-split levels under the 100{,}000 expansion budget. Solve rate: 87.4\% (257/294). Average solution-length to optimal-length ratio: 1.00 (the heuristic is admissible).}
+    \label{fig:manhattan_search_appendix}
+\end{figure}
+
+The right panel of Figure~\ref{fig:manhattan_search_appendix} shows that every solved
+level lies exactly on the $y = x$ optimality line: the A* solution length equals the
+optimal solution length on all 257 solved puzzles, yielding an average solution-length
+to optimal-length ratio of 1.00. This is not an empirical accident but a guaranteed
+consequence of using an admissible heuristic with A* search. The Manhattan-distance
+heuristic, summing the per-box minimum Manhattan distance to any goal cell, is provably
+admissible under unit-cost pushes because pushing a box from $(r_1, c_1)$ to
+$(r_2, c_2)$ requires at least $|r_1 - r_2| + |c_1 - c_2|$ push moves regardless of
+walls, deadlocks, or interactions between boxes. A* search with an admissible
+heuristic is itself guaranteed to return optimal-cost solutions whenever it terminates
+successfully, so a 1.00 length ratio across every solved level is the expected
+behaviour of this configuration rather than an indication that the heuristic is
+particularly accurate. Heuristic accuracy in this setting is reflected only in the
+left panel, the search-cost (node-expansion) distribution and the resulting solve rate
+under the 100{,}000-expansion budget; optimality of the recovered solutions is fixed
+by the admissibility of the heuristic and is not a free parameter of the comparison.
+
 %% ─── CNN Baseline ───────────────────────────────────────────────────────────
 
 \section{CNN Baseline Results}
@@ -68,54 +96,54 @@ wt\_coarse    & 0.5 & 0.2 / 0.2 & 15 & 0.8 & 84.7\% \\
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/baseline}
+    \includegraphics[width=1\textwidth]{neat_sweep/baseline}
     \caption{baseline (\texttt{conn\_del}=0.5, \texttt{stag}=15, \texttt{wt\_pow}=0.5). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/prune_light}
+    \includegraphics[width=1\textwidth]{neat_sweep/prune_light}
     \caption{prune\_light (\texttt{conn\_del}=0.3). Solve rate: 84.7\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/prune_heavy}
+    \includegraphics[width=1\textwidth]{neat_sweep/prune_heavy}
     \caption{prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/node_high}
+    \includegraphics[width=1\textwidth]{neat_sweep/node_high}
     \caption{node\_high (\texttt{node\_add/del}=0.4). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/node_low}
+    \includegraphics[width=1\textwidth]{neat_sweep/node_low}
     \caption{node\_low (\texttt{node\_add/del}=0.1). Solve rate: 83.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/stag_25}
+    \includegraphics[width=1\textwidth]{neat_sweep/stag_25}
     \caption{stag\_25 (\texttt{max\_stagnation}=25). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/stag_40}
+    \includegraphics[width=1\textwidth]{neat_sweep/stag_40}
     \caption{stag\_40 (\texttt{max\_stagnation}=40). Solve rate: 82.7\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/wt_fine}
+    \includegraphics[width=1\textwidth]{neat_sweep/wt_fine}
     \caption{wt\_fine (\texttt{weight\_mutate\_power}=0.3). Solve rate: 84.4\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep_old/wt_coarse}
+    \includegraphics[width=1\textwidth]{neat_sweep/wt_coarse}
     \caption{wt\_coarse (\texttt{weight\_mutate\_power}=0.8). Solve rate: 84.7\%.}
 \end{figure}
