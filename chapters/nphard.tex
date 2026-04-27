@@ -1,7 +1,7 @@
 \section{NP-hard}
-In the previous chapter, we briefly discussed the definition of NP-hard problems as well as the academic significance of Sokoban as a proxy for solving generic NP-hard problems. This leads to the question of how Fryers et al.\ proved that Sokoban is NP-hard.
+The preceding chapter briefly introduced the definition of NP-hard problems and the academic significance of Sokoban as a proxy for generic NP-hard problems. This section presents the proof of Fryers et al.\ that Sokoban is NP-hard.
 
-Before following their proof, we first define a $P$ problem as a problem that can be solved in at most polynomial time. $NP$ problems are ones for which the existence of a solution can be verified in polynomial time, though the solution itself cannot necessarily be derived that quickly. Any $P$ problem is in $NP$ because if we can derive a solution in polynomial time, we can also verify it in polynomial time. It is unknown whether all $NP$ problems are in $P$. $NP\text{-hard}$ problems are ones to which any other $NP$ problem can be reduced. An $NP\text{-hard}$ problem that is also in $NP$ itself is an $NP\text{-complete}$ problem. The simplest $NP\text{-complete}$ problem is the Boolean Satisfiability problem: for a given boolean expression $B(x_1,x_2,\ ...\ ,x_n)$ that includes $\neg$, $\land$, and $\lor$, is there an assignment of $x_1,x_2,\ ...\ ,x_n$ that makes $B$ true?
+Before presenting the proof, we first define a $P$ problem as a problem that can be solved in at most polynomial time. $NP$ problems are ones for which the existence of a solution can be verified in polynomial time, though the solution itself cannot necessarily be derived that quickly. Any $P$ problem is in $NP$ because if we can derive a solution in polynomial time, we can also verify it in polynomial time. It is unknown whether all $NP$ problems are in $P$. $NP\text{-hard}$ problems are ones to which any other $NP$ problem can be reduced. An $NP\text{-hard}$ problem that is also in $NP$ itself is an $NP\text{-complete}$ problem. The simplest $NP\text{-complete}$ problem is the Boolean Satisfiability problem: for a given boolean expression $B(x_1,x_2,\ ...\ ,x_n)$ that includes $\neg$, $\land$, and $\lor$, is there an assignment of $x_1,x_2,\ ...\ ,x_n$ that makes $B$ true?
 
 If Sokoban can answer this question, then the game is as hard as Boolean Satisfiability, which is an $NP\text{-hard}$ problem, and is therefore an $NP\text{-hard}$ problem itself. To establish this, the researchers first demonstrated that simple boolean expressions can be encoded as playable Sokoban levels; ``a level has a solution if and only if the expression can be true, and such that we can construct (in polynomial time) a valuation from a solution and vice versa'' \cite{fryers1995sokoban}. Successfully encoding a boolean expression that includes all of $\neg$, $\land$, and $\lor$ would show that Sokoban can express any propositional formula in this fragment.
 
@@ -42,7 +42,7 @@ If the player can start from the left-end of the graph and reach the right-end o
 
 For example, if $x=0,y=0,z=1$, it would go through the nodes $z$ and $ \neg x$ to reach the right-end of the graph. 
 
-This graph can then be recreated with the previous Sokoban level sections if we define each node as following:
+This graph can then be recreated with the previous Sokoban level sections by defining each node as follows:
 
 \begin{figure}[h] % [h] forces the image to be placed "here"
     \centering
@@ -53,9 +53,9 @@ This graph can then be recreated with the previous Sokoban level sections if we 
 
 The node has entrances $A,D$ and exits $B,C$. The player can traverse the node on the bold line through either the $r_j\text{-gate}$ (an $n\text{-gate}$ that can be traveled through $r_j$ times) or the $turnstile$. Notice that if the player enters $D$ and leaves through $C$, it blocks the $turnstile$ path above and forces the player to go through the $r_j\text{-gate}$ path, as the barrel will be pushed upwards into the $turnstile$ path and become stuck there. The bold path and the faint path are separate because, even though the barrel can be pushed away, it would cause the barrel to get stuck in a non-goal position. This node will be incorporated into the node graph from Figure \ref{fig:nodegraph} in a way that blocks the bold path of the $x$ node when $x=0$, blocks $\neg y$ when $y=1$, and so on.
 
-To show that $B$ has a solution, the player has to be able to complete the node graph implemented in Sokoban shown in Figure \ref{fig:b_implementation}. (Figure \ref{fig:b_implementation} also uses a crossover implemented in Sokoban, which is omitted in this paper for brevity.)
+To show that $B$ has a solution, the player has to be able to complete the node graph implemented in Sokoban shown in Figure \ref{fig:b_implementation}. (Figure \ref{fig:b_implementation} also uses a crossover implemented in Sokoban, which is omitted in this thesis for brevity.)
 
-Suppose $B(x,y,z)$ as implemented in Figure \ref{fig:b_implementation} is true (solvable with all barrels on their goal positions) and there exists a set of inputs $(x_1,x_2,\ ... , x_n)$ (which is $x,y,z$ in our expression) that makes $B$ true. With this condition, the player can solve $B$ by following the steps below:
+Suppose $B(x,y,z)$ as implemented in Figure \ref{fig:b_implementation} is true (solvable with all boxes on their goal positions) and there exists a set of inputs $(x_1,x_2,\ ... , x_n)$ (which is $x,y,z$ in our expression) that makes $B$ true. With this condition, the player can solve $B$ by following the steps below:
 
 \begin{enumerate}
     \item From `start', travel the path $x$ if $x$ is true and $\neg x$ otherwise, and so on.

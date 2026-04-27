@@ -25,13 +25,13 @@ CoDeepNEAT clears the floor that pure NEAT cannot, suggests that hybrid
 neuroevolution is a viable strategy for heuristic compression when pure topology
 evolution is too constrained and a fully hand-designed CNN is too parameter-heavy.
 
-\subsection{Future Work}
+\section{Future Work}
 
 The empirical separation between pure NEAT and CoDeepNEAT, on opposite sides of the
 Manhattan baseline, indicates that further investigation should concentrate on the
 hybrid method rather than on additional scaling of pure topology-and-weight evolution.
 
-Based on the NEAT topology figure, one can deduce that weight perturbation cannot supply the granular updates required by a $500$-dimensional binary input, and this is unlikely to be solved by a larger population or longer evolutionary runs alone. The more
+Figure~\ref{fig:neat_winner_topology} indicates that weight perturbation cannot supply the granular updates required by a $500$-dimensional binary input, and this is unlikely to be solved by a larger population or longer evolutionary runs alone. The more
 productive intervention is to replace the weight optimizer, as CoDeepNEAT does.
 Future work should therefore prioritize CoDeepNEAT-style hybrids in which an
 evolutionary outer loop searches over architecture while a gradient-based inner loop

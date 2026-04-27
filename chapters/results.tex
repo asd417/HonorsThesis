@@ -106,7 +106,9 @@ The NEAT heuristic solves 84.0\% of the 294 held-out levels (247/294, Figure~\re
     \includegraphics[width=1\textwidth]{neat_sweep/baseline}
     \caption{NEAT baseline (\texttt{conn\_del}=0.5) A* search results on the 294 held-out medium-split levels under the 100{,}000 expansion budget. Solve rate: 84.0\% (247/294).}
     \label{fig:neat_baseline_search}
-\end{figure} The winner genome contains 4 internal
+\end{figure}
+
+The winner genome contains 4 internal
 nodes and 21 enabled connections for a total of 25 trainable parameters. This is approximately 0.001\% of the 2{,}031{,}809-parameter CNN baseline. Figure~\ref{fig:neat_winner_topology} visualizes the genome by mapping every enabled input-to-network connection back to its position in the $5 \times 10 \times 10$ input tensor: 12 of the 21 enabled connections feed directly into the output node, while the remaining 9 are split evenly across three hidden nodes (two input edges plus one hidden-to-output edge each). The connectivity is heavily biased toward the BOX channel, with secondary contributions from WALL, GOAL, and PLAYER, and only sparse use of the BG channel.
 
 \begin{figure}[H]
@@ -181,7 +183,7 @@ which identifies weight-perturbation granularity, rather than topological
 expressiveness, as the binding constraint on pure NEAT.
 
 \subsection{CoDeepNEAT Discussion}
-CoDeepNEAT produces a higher solve rate of 88.8\% (261/294) than pure NEAT's 84.0\%, and crucially also clears the Manhattan-distance baseline by 1.4 percentage points. CoDeepNEAT is therefore the only neuroevolved method in this thesis that beats the parameter-free analytical baseline; the gradient-descent phase that distinguishes it from pure NEAT is what closes the gap. The evolved best architecture is a $500 \to 320 \to 320 \to 1$ feed-forward network containing 263{,}361 trainable parameters, about $7.7\times$ smaller than the CNN baseline but roughly $10{,}500\times$ larger than the NEAT genome. The improvement over pure NEAT is likely driven by the fine-tuned weights produced by the Adam optimizer during each genome's gradient-descent phase, which captures finer gradient information about the cost-to-go space than NEAT's pure weight perturbation can. However, this comes at the cost of three orders of magnitude more parameters in exchange for only a 4.8 percentage-point increase in solve rate over NEAT and a 1.4 percentage-point increase over the parameter-free Manhattan baseline.
+CoDeepNEAT produces a higher solve rate of 88.8\% (261/294) than pure NEAT's 84.0\%, and crucially also clears the Manhattan-distance baseline by 1.4 percentage points. CoDeepNEAT is therefore the only neuroevolved method in this thesis that beats the parameter-free analytical baseline; the gradient-descent phase that distinguishes it from pure NEAT is what closes the gap. The evolved best architecture is a $500 \to 320 \to 320 \to 1$ feed-forward network containing 263{,}361 trainable parameters, about $7.7\times$ smaller than the CNN baseline but roughly $10{,}500\times$ larger than the NEAT genome. The improvement over pure NEAT is likely driven by the fine-tuned weights produced by the Adam optimizer during each genome's gradient-descent phase, which captures finer gradient information about the cost-to-go space than NEAT's pure weight perturbation can. However, this improvement requires roughly $10{,}500\times$ more parameters than the NEAT genome, yielding only a 4.8 percentage-point increase in solve rate over NEAT and a 1.4 percentage-point increase over the parameter-free Manhattan baseline.
 
 \subsection{Interpretation of Findings}
 

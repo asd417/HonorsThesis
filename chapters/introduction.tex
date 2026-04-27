@@ -3,7 +3,8 @@
     \textbf{Introduction}
 \end{center}
 
-\section{Background and Motivation}
+\section*{Background and Motivation}
+\addcontentsline{toc}{section}{Background and Motivation}
 
 Sokoban is a combinatorial planning puzzle invented by Hiroyuki Imabayashi in Japan in 1981.
 A player occupies a grid of cells containing walls, boxes, and goal positions, and must push
@@ -64,7 +65,8 @@ In such models, the agent unrolls the world model forward from the current state
 imaginary trajectories that it encodes alongside real observations to inform its policy. Although Boxoban was originally framed as a stress test for imagination-based agents, it is a challenging testbed for reinforcement learning agents more broadly: the long planning horizons, irreversible moves, and sparse reward structure of Sokoban make it a valid benchmark for any method that must learn to plan, and the fixed $10 \times 10$ grid size yields a compact $5 \times 10 \times 10$ multi-hot state representation that any architecture can consume directly without resizing or per-level preprocessing. The scale of nine million unique levels prevents any solver from memorizing solutions and instead demands genuine generalization
 across the full distribution of puzzle configurations.
 
-\section{Contributions}
+\section*{Contributions}
+\addcontentsline{toc}{section}{Contributions}
 
 This thesis makes four primary contributions, organized as a pair of reference
 baselines bracketing two neuroevolved heuristics.

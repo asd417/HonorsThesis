@@ -18,9 +18,9 @@ One of the earliest subsequent strands of academic research on Sokoban focused o
 
 The researchers achieved automatic generation of Sokoban levels through a three-step methodology. First, candidate problems are generated randomly from a prototype and three templates. Next, unsolvable candidates are removed by a Sokoban solver. Finally, trivial or uninteresting candidates are removed by the evaluator. Templates are $2\times 3$, $2\times 2$, and $3\times 3$ empty spaces, used to encourage the generation of multiple paths inside the space. After tiles are placed (Figure \ref{fig:ag1}), there are some tiles where a box can never be placed. These tiles are marked as GOAL\_AVOID (Figure \ref{fig:autogeneration2}). Goal-candidate tiles that are in corners are marked as COR\_GOAL, and the next goal is placed on goal-candidate tiles that are not dead ends and not COR\_GOAL. The dead-end ADD\_AVOID areas are recalculated after every placement.
 
-After the generation of the level, a Breadth-First Search is used to solve the puzzle. While the BFS solver is not able to find solutions to puzzles with long sequences, it can still effectively search for solutions with short sequences \cite{fryers1995sokoban}. Puzzles that cannot be solved are pruned in this step.
+After the generation of the level, a Breadth-First Search is used to solve the puzzle. While the BFS solver is unable to find solutions to puzzles with long sequences, it can still effectively search for solutions with short sequences \cite{fryers1995sokoban}. Puzzles that cannot be solved are pruned in this step.
 
-The most crucial contribution of this paper is the metric used to determine whether a generated puzzle is non-trivial and interesting. The evaluation program aims to evaluate artistic value using the following criteria:
+A key contribution of that work is the metric used to determine whether a generated puzzle is non-trivial and interesting. The evaluation program aims to evaluate artistic value using the following criteria:
 
 \begin{center}
     \begin{minipage}{0.8\textwidth} % Adjust width as needed
@@ -32,7 +32,6 @@ The most crucial contribution of this paper is the metric used to determine whet
     \end{minipage}
 \end{center}
 
-The authors claim that these criteria guide the generation of interesting puzzles.
 
 
 \begin{table}[ht]
