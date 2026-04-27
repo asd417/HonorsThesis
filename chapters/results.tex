@@ -25,6 +25,13 @@ set rather than the full nine-million-level Boxoban corpus: the heuristic is not
 data-limited beyond a few thousand training examples, and additional levels yield
 diminishing returns at substantial BFS-solving cost.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{cnn/data_scaling_solve_rate}
+    \caption{CNN baseline solve rate as a function of training set size.}
+    \label{fig:cnn_scaling_solve}
+\end{figure}
+
 The 100{,}000 expansion budget is imposed deliberately so that the CNN, NEAT, and
 CoDeepNEAT heuristics are
 compared under identical search-time budgets. A less accurate heuristic will explore
