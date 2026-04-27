@@ -44,13 +44,13 @@ isolates how heuristic accuracy translates into search efficiency.
 
 The NEAT heuristic solves 84.0\% of the 294 held-out levels (247/294, Figure~\ref{fig:neat_baseline_search}; full hyperparameter sweep in Appendix~\ref{app:neat_sweeps}), leaving 47 unsolved.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{neat_sweep/baseline}
+    \includegraphics[width=1\textwidth]{neat_sweep_old/baseline}
     \caption{NEAT baseline (\texttt{conn\_del}=0.5) A* search results on the 294 held-out medium-split levels under the 100{,}000 expansion budget. Solve rate: 84.0\% (247/294).}
     \label{fig:neat_baseline_search}
 \end{figure} The winner genome contains 4 internal
-nodes and 208 enabled connections for a total of 212 trainable parameters. This is 0.01\% of the 2{,}031{,}809-parameter CNN baseline. Because every run is capped at
+nodes and 208 enabled connections for a total of 25 trainable parameters. This is 0.01\% of the 2{,}031{,}809-parameter CNN baseline. Because every run is capped at
 the same 100{,}000-expansion budget used for the CNN, failure is overwhelmingly
 attributable to heuristic inaccuracy rather than compute starvation: the 212-parameter
 genome produces coarse cost-to-go estimates that mislead the search priority, causing
@@ -73,7 +73,7 @@ CoDeepNEAT produced a higher solve rate of 88.8\% (261/294) compared to the 84.0
 
 The results confirm that neuroevolution can produce heuristics that are radically more
 parameter-efficient while remaining useful for A* search. NEAT converges to a genome
-with 4 internal nodes and 208 enabled connections, 212 trainable parameters total, approximately 0.01\% of the CNN baseline's 2{,}031{,}809 parameters. CoDeepNEAT
+with 4 internal nodes and 21 enabled connections, 25 trainable parameters total, approximately 0.01\% of the CNN baseline's 2{,}031{,}809 parameters. CoDeepNEAT
 discovers a $500 \to 320 \to 320 \to 1$ architecture with 263{,}361 trainable
 parameters, roughly $7.7\times$ smaller than the CNN baseline. The gap in solve rate
 relative to the CNN (84.0\% and 88.8\% versus 100\%) is non-trivial, but the degree

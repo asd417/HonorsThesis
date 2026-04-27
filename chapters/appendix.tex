@@ -34,17 +34,14 @@
     \label{fig:codeepneat_search}
 \end{figure}
 
-%% ─── NEAT Sweep (New) ────────────────────────────────────────────────────────
+%% ─── NEAT Sweep ──────────────────────────────────────────────────────────────
 
 \section{NEAT Hyperparameter Sweep}
 \label{app:neat_sweeps}
 
-The following tables and figures show results from the two NEAT ablation sweeps.
-Table~\ref{tab:neat_sweep_old} summarizes the first sweep, which varied connection
+Table~\ref{tab:neat_sweep} summarizes the NEAT ablation sweep, which varied connection
 deletion probability, node mutation rates, stagnation limit, and weight mutation
-power across nine configurations. Table~\ref{tab:neat_sweep_new} shows the
-second sweep, which refined the three pruning configurations with a corrected
-full-dataset evaluation. All configurations used a population size of 150.
+power across nine configurations. All configurations used a population size of 150.
 
 \begin{table}[H]
 \centering
@@ -63,92 +60,62 @@ wt\_fine      & 0.5 & 0.2 / 0.2 & 15 & 0.3 & 84.4\% \\
 wt\_coarse    & 0.5 & 0.2 / 0.2 & 15 & 0.8 & 84.7\% \\
 \bottomrule
 \end{tabular}
-\caption{NEAT sweep 1 (\_old): nine configurations and their A* solve rates.}
-\label{tab:neat_sweep_old}
+\caption{NEAT sweep: nine configurations and their A* solve rates.}
+\label{tab:neat_sweep}
 \end{table}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{lcr}
-\toprule
-\textbf{Config} & \texttt{conn\_delete\_prob} & \textbf{Solve Rate} \\
-\midrule
-baseline     & 0.5 & 84.0\% \\
-prune\_light  & 0.3 & 83.7\% \\
-prune\_heavy  & 0.7 & 84.7\% \\
-\bottomrule
-\end{tabular}
-\caption{NEAT sweep 2: pruning configurations with full-dataset evaluation.}
-\label{tab:neat_sweep_new}
-\end{table}
-
-\subsection*{Sweep 1 Graphs}
+\subsection*{Per-configuration A* Search Results}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/baseline}
-    \caption{Sweep 1 — baseline (\texttt{conn\_del}=0.5, \texttt{stag}=15, \texttt{wt\_pow}=0.5). Solve rate: 84.0\%.}
+    \caption{baseline (\texttt{conn\_del}=0.5, \texttt{stag}=15, \texttt{wt\_pow}=0.5). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/prune_light}
-    \caption{Sweep 1 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 84.7\%.}
+    \caption{prune\_light (\texttt{conn\_del}=0.3). Solve rate: 84.7\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/prune_heavy}
-    \caption{Sweep 1 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.0\%.}
+    \caption{prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/node_high}
-    \caption{Sweep 1 — node\_high (\texttt{node\_add/del}=0.4). Solve rate: 84.0\%.}
+    \caption{node\_high (\texttt{node\_add/del}=0.4). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/node_low}
-    \caption{Sweep 1 — node\_low (\texttt{node\_add/del}=0.1). Solve rate: 83.0\%.}
+    \caption{node\_low (\texttt{node\_add/del}=0.1). Solve rate: 83.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/stag_25}
-    \caption{Sweep 1 — stag\_25 (\texttt{max\_stagnation}=25). Solve rate: 84.0\%.}
+    \caption{stag\_25 (\texttt{max\_stagnation}=25). Solve rate: 84.0\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/stag_40}
-    \caption{Sweep 1 — stag\_40 (\texttt{max\_stagnation}=40). Solve rate: 82.7\%.}
+    \caption{stag\_40 (\texttt{max\_stagnation}=40). Solve rate: 82.7\%.}
 \end{figure}
 
-\begin{center}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/wt_fine}
-    \caption{Sweep 1 — wt\_fine (\texttt{weight\_mutate\_power}=0.3). Solve rate: 84.4\%.}
+    \caption{wt\_fine (\texttt{weight\_mutate\_power}=0.3). Solve rate: 84.4\%.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{neat_sweep_old/wt_coarse}
-    \caption{Sweep 1 — wt\_coarse (\texttt{weight\_mutate\_power}=0.8). Solve rate: 84.7\%.}
-\end{figure}
-\end{center}
-\subsection*{Sweep 2 Graphs}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{neat_sweep/prune_light}
-    \caption{Sweep 2 — prune\_light (\texttt{conn\_del}=0.3). Solve rate: 83.7\%.}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{neat_sweep/prune_heavy}
-    \caption{Sweep 2 — prune\_heavy (\texttt{conn\_del}=0.7). Solve rate: 84.7\%.}
+    \caption{wt\_coarse (\texttt{weight\_mutate\_power}=0.8). Solve rate: 84.7\%.}
 \end{figure}
