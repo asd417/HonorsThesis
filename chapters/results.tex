@@ -55,7 +55,7 @@ the same 100{,}000-expansion budget used for the CNN, failure is overwhelmingly
 attributable to heuristic inaccuracy rather than compute starvation: the 212-parameter
 genome produces coarse cost-to-go estimates that mislead the search priority, causing
 A* to expand large regions of the state space around misleading local minima before
-either finding a solution or exhausting the budget. The network simply lacks the
+either finding a solution or exhausting the budget. The network lacks the
 capacity to distinguish structurally similar states whose true cost-to-go differs
 sharply, so the search cannot rank successors reliably near deadlock-adjacent
 configurations. Raising the expansion budget would recover some of these levels, but
