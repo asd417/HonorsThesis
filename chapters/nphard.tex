@@ -62,7 +62,7 @@ Suppose $B(x,y,z)$ as implemented in \ref{fig:b_implementation} is true (solvabl
 2. The player reaches P for the first time. From here, travel the bold paths using $turnstile$ path of each nodes without using $r_j-gates$ which can be done because $B$ is true. The player reaches Q.
 3. Traverse the faint paths not used in the first cycle to return to P.
 4. From P, use the bold paths to reach Q, using $r_j-gates$ of a set of nodes that connects from P to Q. 
-5. The player has now fully solved the path between 'start' and P. The remaining combinations of the bold paths that connect P to Q can be traveled by using the bottome bold line that has no node.
+5. The player has now fully solved the path between 'start' and P. The remaining combinations of the bold paths that connect P to Q can be traveled by using the bottom bold line that has no node.
 6. After travelling through the $r+1-gate$ $r+1$ times, the player can place the barrel in the R section to complete the entire level.
 
 This demonstrates that Sokoban can successfully encode an $NP-hard$ problem and therefore is an $NP-hard$ problem itself. Readers can choose to complete Figure \ref{fig:b_implementation} by hand with the truth table below:
