@@ -21,15 +21,15 @@ trained by AdamW on cost-to-go labels derived from Breadth-First Search solution
 trajectories. NEAT (NeuroEvolution of Augmenting Topologies) evolves both the topology
 and weights of a feed-forward heuristic from scratch using the same labels, starting
 from approximately 26 parameters and growing complexity only where it improves
-prediction accuracy; the evolved winner contained 212 trainable parameters (4 internal
-nodes and 208 enabled connections). CoDeepNEAT coevolves populations of network modules
+prediction accuracy; the evolved winner contained 25 trainable parameters (4 internal
+nodes and 21 enabled connections). CoDeepNEAT coevolves populations of network modules
 and blueprint topologies, combining evolutionary architecture search with per-genome
 gradient-descent weight training, producing an assembled $500 \to 320 \to 320 \to 1$
 network with 263{,}361 parameters.
 
 Under A* search with a 100{,}000-node expansion budget, the CNN baseline solves
 100\% (294/294) of the held-out levels, NEAT solves 84.0\% (247/294) using roughly
-0.01\% of the CNN's parameter count, and CoDeepNEAT solves 88.8\% (261/294) using
+0.001\% of the CNN's parameter count, and CoDeepNEAT solves 88.8\% (261/294) using
 roughly $7.7\times$ fewer parameters than the CNN. The results show that
 neuroevolution can close the accuracy gap relative to the gradient-trained
 baseline while maintaining a substantial advantage in parameter count.
