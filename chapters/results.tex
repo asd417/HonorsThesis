@@ -36,30 +36,39 @@ heuristic --- while being tight enough that the smaller neuroevolved heuristics 
 meaningfully constrained. Reporting all three methods under the same cap therefore
 isolates how heuristic accuracy translates into search efficiency.
 
-\subsection{NEAT Failure Analysis}
+\subsection{NEAT Discussion}
 
-The NEAT heuristic solves 84.0\% of the 294 held-out levels (see Appendix
-\ref{app:neat_sweeps}), leaving 47 unsolved. Because every run is capped at the
-same 100{,}000-expansion budget used for the CNN, failure is overwhelmingly
-attributable to heuristic inaccuracy rather than compute starvation: the 24-parameter
+The NEAT heuristic solves 84.0\% of the 294 held-out levels (247/294, see Appendix
+\ref{app:neat_sweeps}), leaving 47 unsolved. The winner genome contains 4 internal
+nodes and 208 enabled connections for a total of 212 trainable parameters --- roughly
+0.01\% of the 2{,}031{,}809-parameter CNN baseline. Because every run is capped at
+the same 100{,}000-expansion budget used for the CNN, failure is overwhelmingly
+attributable to heuristic inaccuracy rather than compute starvation: the 212-parameter
 genome produces coarse cost-to-go estimates that mislead the search priority, causing
 A* to expand large regions of the state space around misleading local minima before
-either finding a solution or exhausting the budget. This is the expected failure
-mode for an extremely compact heuristic --- the network lacks the capacity to
-distinguish structurally similar states whose true cost-to-go differs sharply, so
-the search cannot rank successors reliably near deadlock-adjacent configurations.
-Raising the expansion budget would recover some of these levels, but the comparison
-in this thesis deliberately fixes the budget so that heuristic quality, not search
-effort, is what varies across methods.
+either finding a solution or exhausting the budget. The network simply lacks the
+capacity to distinguish structurally similar states whose true cost-to-go differs
+sharply, so the search cannot rank successors reliably near deadlock-adjacent
+configurations. Raising the expansion budget would recover some of these levels, but
+the comparison in this thesis deliberately fixes the budget so that heuristic quality,
+not search effort, is what varies across methods. For the NEAT network to produce a
+better heuristic function, it would need to grow into a larger topology with more
+trainable parameters by modifying the evolution configuration --- for example, the
+node-addition probability could be increased to favor adding hidden nodes throughout
+the generations.
+
+\subsection{CoDeepNEAT Discussion}
+CoDeepNEAT produced a higher solve rate of 88.8\% (261/294) compared to the 84.0\% of pure NEAT. The evolved best architecture is a $500 \to 320 \to 320 \to 1$ feed-forward network containing 263{,}361 trainable parameters --- about $7.7\times$ smaller than the CNN baseline but roughly $1{,}240\times$ larger than the NEAT genome. The improvement over pure NEAT is likely driven by the finetuned weights produced by the Adam optimizer during each genome's gradient-descent phase, which captures finer gradient information about the cost-to-go space than NEAT's pure weight perturbation can. However, this comes at the cost of three orders of magnitude more parameters in exchange for only a 4.8 percentage-point increase in solve rate over NEAT.
 
 \subsection{Interpretation of Findings}
 
 The results confirm that neuroevolution can produce heuristics that are radically more
 parameter-efficient while remaining useful for A* search. NEAT converges to a genome
-with 7 nodes and 17 connections --- 24 trainable parameters in total, representing
-less than 0.002\% of the CNN baseline's parameter count. CoDeepNEAT discovers
-architectures in the range of 32,000 to 170,000 parameters, between 12$\times$ and
-63$\times$ smaller than the CNN baseline. The gap in solve rate relative to the CNN is
-non-trivial, but the degree to which both neuroevolved heuristics close this gap while
-operating at a fraction of the parameter budget suggests that heuristic compression
-through neuroevolution is a direction warranting further study.
+with 4 internal nodes and 208 enabled connections --- 212 trainable parameters in
+total, approximately 0.01\% of the CNN baseline's 2{,}031{,}809 parameters. CoDeepNEAT
+discovers a $500 \to 320 \to 320 \to 1$ architecture with 263{,}361 trainable
+parameters, roughly $7.7\times$ smaller than the CNN baseline. The gap in solve rate
+relative to the CNN (84.0\% and 88.8\% versus 100\%) is non-trivial, but the degree
+to which both neuroevolved heuristics close this gap while operating at a fraction of
+the parameter budget suggests that heuristic compression through neuroevolution is a
+direction warranting further study.

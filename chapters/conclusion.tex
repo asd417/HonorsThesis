@@ -7,13 +7,14 @@ architecture search with gradient-descent weight training.
 
 The CNN baseline established a strong reference point, achieving a 100\% solve rate
 on held-out levels within the 100{,}000 node expansion budget. NEAT produced a heuristic
-of just 24 parameters: a 99.9988\% reduction in parameter count compared to the CNN
-baseline while achieving an 84.0\% solve rate, a striking result considering the
-extreme reduction in model complexity. CoDeepNEAT, which coevolves dense-dropout modules
-and blueprint topologies and trains each assembled genome by gradient descent, discovered
-architectures in the 32{,}000 to 170{,}000 parameter range (between 12$\times$ and 63$\times$
-smaller than the CNN baseline) and achieved an 88.8\% solve rate, narrowing the gap to the
-CNN by combining evolutionary architecture search with gradient-based weight optimization.
+of just 212 parameters (4 internal nodes and 208 enabled connections): a roughly
+99.99\% reduction in parameter count compared to the CNN baseline while achieving an
+84.0\% solve rate, a striking result considering the extreme reduction in model
+complexity. CoDeepNEAT, which coevolves dense-dropout modules and blueprint topologies
+and trains each assembled genome by gradient descent, discovered a $500 \to 320 \to 320 \to 1$
+architecture with 263{,}361 parameters (roughly $7.7\times$ smaller than the CNN baseline)
+and achieved an 88.8\% solve rate, narrowing the gap to the CNN by combining
+evolutionary architecture search with gradient-based weight optimization.
 
 Both neuroevolved heuristics are meaningfully weaker than the CNN baseline, but the scale
 of the parameter reduction relative to the modest drop in solve rate suggests that

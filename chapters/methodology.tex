@@ -97,7 +97,7 @@ $500 \to 256 \to 128 \to 64 \to 1$ & $169{,}473$ \\
 \end{tabular}
 \end{center}
 
-Even the largest plausible CoDeepNEAT topology ($\sim$170K parameters) is more than $12\times$ smaller than the CNN baseline; the smallest ($\sim$32K) is more than $60\times$ smaller.
+The table above lists illustrative architectures within the per-layer search space rather than upper bounds on the full assembled network: because blueprint mutation can stack multiple modules and unit counts up to 512 are permitted, deeper or wider assemblies are reachable during evolution. The actual evolved winner is a $500 \to 320 \to 320 \to 1$ network with 263{,}361 trainable parameters, roughly $7.7\times$ smaller than the CNN baseline.
 
 \section{Training Metrics}
 
